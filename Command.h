@@ -5,5 +5,5 @@
 class Command {
 public:
 	virtual ~Command() {}
-	virtual void execute(const GameActor& actor) {}
+	virtual void execute(GameActor& actor) = 0;
 };

@@ -17,10 +17,10 @@ public:
 	virtual void execute(GameActor& actor){
 		switch (m_direction) {
 		case MOVE_UP:
-			actor.setPos(actor.getX(), actor.getY() + 5);
+			actor.setPos(actor.getX(), actor.getY() - 5);
 			break;
 		case MOVE_DOWN:
-			actor.setPos(actor.getX(), actor.getY() - 5);
+			actor.setPos(actor.getX(), actor.getY() + 5);
 			break;
 		case MOVE_LEFT:
 			actor.setPos(actor.getX() - 5, actor.getY());
