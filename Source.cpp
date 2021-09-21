@@ -5,11 +5,17 @@
 #include <SDL_image.h>
 #include <stdio.h>
 #include <string>
+#include <SDL_ttf.h>
 #include "InputHandler.h"
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+enum GameState {
+	MAIN_MENU,
+	IN_GAME,
+	GAME_OVER
+};
+
+////CLASS HEADERS////
+/////////////////////
 
 //Texture wrapper class
 class LTexture
@@ -23,6 +29,9 @@ public:
 
 	//Loads image at specified path
 	bool loadFromFile(std::string path);
+
+	//Creates image from font string
+	bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
 
 	//Deallocates texture
 	void free();
@@ -61,6 +70,17 @@ bool loadMedia();
 //Frees media and shuts down SDL
 void close();
 
+//END CLASS HEADERS////////
+///////////////////////////
+
+GameState gameState = MAIN_MENU;
+
+//Screen dimension constants
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
+
+
+
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
 
@@ -78,6 +98,20 @@ const int IDLE_ANIMATION_FRAMES = 2;
 const int WALKING_ANIMATION_FRAMES = 8;
 SDL_Rect gSpriteClips[IDLE_ANIMATION_FRAMES + WALKING_ANIMATION_FRAMES];
 LTexture gSpriteSheetTexture;
+
+//Main menu texture
+LTexture gMainMenuTexture;
+
+//Globally used font
+TTF_Font* gFont = NULL;
+
+//Rendered text texture
+LTexture gTextTexture;
+
+
+//Current animation frame
+int frame = 0;
+
 
 
 LTexture::LTexture()
@@ -132,6 +166,40 @@ bool LTexture::loadFromFile(std::string path)
 
 	//Return success
 	mTexture = newTexture;
+	return mTexture != NULL;
+}
+
+bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
+{
+	//Get rid of preexisting texture
+	free();
+
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+	if (textSurface == NULL)
+	{
+		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+	}
+	else
+	{
+		//Create texture from surface pixels
+		mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+		if (mTexture == NULL)
+		{
+			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface(textSurface);
+	}
+
+	//Return success
 	return mTexture != NULL;
 }
 
@@ -238,6 +306,13 @@ bool init()
 					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
 					success = false;
 				}
+
+				//Initialize SDL_ttf
+				if (TTF_Init() == -1)
+				{
+					printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+					success = false;
+				}
 			}
 		}
 	}
@@ -318,6 +393,23 @@ bool loadMedia()
 		gSpriteClips[9].h = 32;
 	}
 
+	if (!gMainMenuTexture.loadFromFile("images/red_dwarf_main_menu_art.png")) {
+		printf("Failed to load main menu texture!\n");
+		success = false;
+	}
+
+	//Open the font
+	gFont = TTF_OpenFont("fonts/lazy.ttf", 28);
+	if (gFont == NULL)
+	{
+		printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+		success = false;
+	}
+	else
+	{
+
+	}
+
 	return success;
 }
 
@@ -325,6 +417,12 @@ void close()
 {
 	//Free loaded images
 	gSpriteSheetTexture.free();
+	gMainMenuTexture.free();
+	gTextTexture.free();
+
+	//Free global font
+	TTF_CloseFont(gFont);
+	gFont = NULL;
 
 	//Destroy window	
 	SDL_DestroyRenderer(gRenderer);
@@ -341,8 +439,60 @@ void close()
 	player = NULL;
 
 	//Quit SDL subsystems
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
+}
+
+void mainMenu() {
+	gMainMenuTexture.render(0, 0);
+
+	//Render text
+	SDL_Color textColor = { 255, 255, 255 };
+	gTextTexture.loadFromRenderedText("Press any key to start", textColor);
+	gTextTexture.render(500, 500);
+
+	//Update screen
+	SDL_RenderPresent(gRenderer);
+}
+
+void playGame() {
+	Command* command = inputHandler->handleInput();
+
+	if (command) {
+		command->execute(*player);
+	}
+
+	//Set red dwarf facing direction based on key state
+	SDL_RendererFlip direction = SDL_FLIP_NONE;
+	const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+	if (currentKeyStates[SDL_SCANCODE_LEFT]) {
+		direction = SDL_FLIP_NONE;
+	}
+	if (currentKeyStates[SDL_SCANCODE_RIGHT]) {
+		direction = SDL_FLIP_HORIZONTAL;
+	}
+
+	//Clear screen
+	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_RenderClear(gRenderer);
+
+	//Render current frame
+	SDL_Rect* currentClip = &gSpriteClips[frame / 4 + IDLE_ANIMATION_FRAMES];
+	//gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, 0, 0, direction);
+	gSpriteSheetTexture.render(player->getX(), player->getY(), currentClip, 0, 0, direction);
+
+	//Update screen
+	SDL_RenderPresent(gRenderer);
+
+	//Go to next frame
+	++frame;
+
+	//Cycle animation
+	if (frame / 4 >= WALKING_ANIMATION_FRAMES)
+	{
+		frame = 0;
+	}
 }
 
 int main(int argc, char* args[])
@@ -367,8 +517,7 @@ int main(int argc, char* args[])
 			//Event handler
 			SDL_Event e;
 
-			//Current animation frame
-			int frame = 0;
+
 
 			//While application is running
 			while (!quit)
@@ -381,44 +530,22 @@ int main(int argc, char* args[])
 					{
 						quit = true;
 					}
+					//User pressed any button while in main menu
+					else if (e.type == SDL_KEYDOWN && gameState == MAIN_MENU) {
+						gameState = IN_GAME;
+					}
 				}
-
-				Command* command = inputHandler->handleInput();
-
-				if (command) {
-					command->execute(*player);
+				switch (gameState) {
+					case MAIN_MENU:
+						mainMenu();
+						break;
+					case IN_GAME:
+						playGame();
+						break;
+					default:
+						break;
 				}
-
-				//Set red dwarf facing direction based on key state
-				SDL_RendererFlip direction = SDL_FLIP_NONE;
-				const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-				if (currentKeyStates[SDL_SCANCODE_LEFT]) {
-					direction = SDL_FLIP_NONE;
-				}
-				if (currentKeyStates[SDL_SCANCODE_RIGHT]) {
-					direction = SDL_FLIP_HORIZONTAL;
-				}
-
-				//Clear screen
-				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-				SDL_RenderClear(gRenderer);
-
-				//Render current frame
-				SDL_Rect* currentClip = &gSpriteClips[frame / 4 + IDLE_ANIMATION_FRAMES];
-				//gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, 0, 0, direction);
-				gSpriteSheetTexture.render(player->getX(), player->getY(), currentClip, 0, 0, direction);
-
-				//Update screen
-				SDL_RenderPresent(gRenderer);
-
-				//Go to next frame
-				++frame;
-
-				//Cycle animation
-				if (frame / 4 >= WALKING_ANIMATION_FRAMES)
-				{
-					frame = 0;
-				}
+				
 			}
 		}
 	}
