@@ -244,6 +244,12 @@ void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* cen
 		renderQuad.w = clip->w * scale;
 		renderQuad.h = clip->h * scale;
 	}
+	else {
+		if (mWidth > SCREEN_WIDTH || mHeight > SCREEN_WIDTH) {
+			renderQuad.w = SCREEN_WIDTH;
+			renderQuad.h = SCREEN_HEIGHT;
+		}
+	}
 
 	//Render to screen
 	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
@@ -532,7 +538,8 @@ int main(int argc, char* args[])
 					}
 					//User pressed any button while in main menu
 					else if (e.type == SDL_KEYDOWN && gameState == MAIN_MENU) {
-						gameState = IN_GAME;
+						if(e.key.keysym.sym == SDLK_SPACE)
+							gameState = IN_GAME;
 					}
 				}
 				switch (gameState) {
