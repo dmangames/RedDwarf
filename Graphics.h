@@ -10,15 +10,22 @@
 
 #include "Resources.h"
 #include "GameActor.h"
+#include "FontRenderer.h"
+#include "FPSCounter.h"
+#include "Overlay.h"
+
+class Overlay;
+class FontRenderer;
+class GameActor;
 
 class Graphics {
 	// width and height of the window in px
 	static const int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 	Resources* resources;
-	//FPSCounter fps_counter;
-	//FontRenderer* font_renderer;
-	//Overlay* overlay;
+	FPSCounter fps_counter;
+	FontRenderer* font_renderer;
+	Overlay* overlay;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
@@ -27,7 +34,7 @@ class Graphics {
 public:
 	Graphics();
 	void clear_screen();
-	void render_overlay(std::vector<GameActor*>* actors);
+	void render_overlay();
 	void present_renderer(float delta);
 	void render_actors(std::vector<GameActor*>* actors, float delta);
 	int get_width();

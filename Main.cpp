@@ -7,15 +7,18 @@
 #include <string>
 #include <SDL_ttf.h>
 #include "InputHandler.h"
-#include "LTexture.h"
-#include "Globals.h"
+
+#include <stdlib.h>
+#include <time.h>
+#include "Graphics.h"
+#include "World.h"
 
 enum GameState {
 	MAIN_MENU,
 	IN_GAME,
 	GAME_OVER
 };
-
+/*
 ////CLASS HEADERS////
 /////////////////////
 
@@ -190,6 +193,7 @@ void close()
 	SDL_Quit();
 }
 
+
 void mainMenu() {
 	gMainMenuTexture.render(0, 0);
 
@@ -237,34 +241,39 @@ void playGame() {
 		frame = 0;
 	}
 }
+*/
+
+void mainMenu() {
+
+}
+
+
 
 int main(int argc, char* args[])
 {
-	//Start up SDL and create window
-	if (!init())
+	// Init random seed
+	srand(time(NULL));
+
+	InputHandler inputs;
+	Graphics graphics;
+	World world(graphics.get_width(), graphics.get_height());
+
+	//Game state
+	GameState gameState = MAIN_MENU;
+
+	//Main loop flag
+	bool quit = false;
+
+	//Event handler
+	SDL_Event e;
+
+
+
+	//While application is running
+	while (!quit)
 	{
-		printf("Failed to initialize!\n");
-	}
-	else
-	{
-		//Load media
-		if (!loadMedia())
-		{
-			printf("Failed to load media!\n");
-		}
-		else
-		{
-			//Main loop flag
-			bool quit = false;
-
-			//Event handler
-			SDL_Event e;
-
-
-
-			//While application is running
-			while (!quit)
-			{
+		switch (gameState) {
+			case MAIN_MENU:
 				//Handle events on queue
 				while (SDL_PollEvent(&e) != 0)
 				{
@@ -275,27 +284,29 @@ int main(int argc, char* args[])
 					}
 					//User pressed any button while in main menu
 					else if (e.type == SDL_KEYDOWN && gameState == MAIN_MENU) {
-						if(e.key.keysym.sym == SDLK_SPACE)
+						if (e.key.keysym.sym == SDLK_SPACE)
 							gameState = IN_GAME;
 					}
 				}
-				switch (gameState) {
-					case MAIN_MENU:
-						mainMenu();
-						break;
-					case IN_GAME:
-						playGame();
-						break;
-					default:
-						break;
-				}
-				
-			}
+				break;
+			case IN_GAME:
+				inputs.update();
+				quit = inputs.get_quit();
+
+				world.update(&inputs);
+
+				graphics.clear_screen();
+				graphics.render_actors(world.get_actors(), world.get_delta());
+				graphics.render_overlay();
+
+				graphics.present_renderer(world.get_delta());
+				break;
+			default:
+				break;
 		}
+				
 	}
 
-	//Free resources and close SDL
-	close();
 
 	return 0;
 }

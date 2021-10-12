@@ -1,9 +1,12 @@
+#pragma once
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <stdio.h>
 #include <string>
 #include <SDL_ttf.h>
-#include "Globals.h"
+
+#include "Graphics.h"
 
 //Texture wrapper class
 class LTexture
@@ -43,6 +46,12 @@ public:
 private:
 	//The actual hardware texture
 	SDL_Texture* mTexture;
+
+	//The renderer
+	SDL_Renderer* gRenderer;
+	
+	//the font
+	TTF_Font* gFont;
 
 	//Image dimensions
 	int mWidth;

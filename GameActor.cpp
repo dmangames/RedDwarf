@@ -1,11 +1,71 @@
 /*Game Actor*/
 #include "GameActor.h"
+#include "Hitbox.h"
 
-GameActor::GameActor(std::string name) {
-	m_name = name;
-	setPos(0, 0);
+// PRIVATE HELPER METHODS
+
+float GameActor::get_center_x() {
+	return x + w / 2;
 }
 
+float GameActor::get_center_y() {
+	return y + h / 2;
+}
+
+void GameActor::check_bounds() {
+	// check bounds can be used for now to make the player not leave the screen
+	if (this->get_center_x() < 0) {
+		x = 0 + w / 2;
+	}
+	else if (this->get_center_x() > screen_w) {
+		x = screen_w - w / 2;
+	}
+	if (this->get_center_y() < 0) {
+		y = 0 + h / 2;
+	}
+	else if (this->get_center_y() > screen_h) {
+		y = screen_h - h / 2;
+	}
+}
+
+// PUBLIC METHODS
+
+GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h) {
+	x = x;
+	y = y;
+	w = w;
+	h = h;
+	screen_w = screen_w;
+	screen_h = screen_h;
+	hitbox = NULL;
+}
+
+Hitbox* GameActor::get_hitbox() {
+	return hitbox;
+}
+
+float GameActor::get_x() {
+	return x;
+}
+
+float GameActor::get_y() {
+	return y;
+}
+
+void GameActor::set_x(float x) {
+	this->x = x;
+}
+
+void GameActor::set_y(float y) {
+	this->y = y;
+}
+
+
+GameActor::~GameActor() {
+	if (hitbox != NULL) {
+		delete hitbox;
+	}
+}
 //GameActor::GameActor(std::string name, int idleFrames, int walkingFrames) {
 //	m_name = name;
 //	setPos(0, 0);
@@ -22,12 +82,3 @@ GameActor::GameActor(std::string name) {
 //		animations[i] = aList[i];
 //	}
 //}
-
-void GameActor::setName(std::string name) {
-	m_name = name;
-}
-
-void GameActor::setPos(int x, int y) {
-	m_xpos = x;
-	m_ypos = y;
-}
