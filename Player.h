@@ -5,6 +5,11 @@
 #include "Hitbox.h"
 #include "InputHandler.h"
 
+enum class AnimState {
+	IDLE,
+	WALK,
+};
+
 class Player : public GameActor {
 	
 	// References
@@ -28,6 +33,9 @@ class Player : public GameActor {
 	SDL_Rect anim_rects[10];
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	int frame;
+	int startFrame;
+	int updatesPerFrame;
+	AnimState state = AnimState::IDLE;
 
 
 	// Helper Functions

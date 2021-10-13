@@ -16,6 +16,10 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     max_speed = 300.0f;
     angle = 0;
     alive = true;
+    state = AnimState::IDLE;
+    frame = 0;
+    startFrame = 0;
+    updatesPerFrame = 16;
 
     this->player_num = player_num;
     this->actors = actors;
@@ -25,7 +29,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 
 void Player::update(float delta) {
 
-    printf("X Velocity: %4.2f\n", vx);
+    //printf("X Velocity: %4.2f\n", vx);
 
     // Apply change in x and y directions
     x += delta * vx;
@@ -45,8 +49,44 @@ void Player::update(float delta) {
         vy = -max_speed;
     }
 
+    if (abs(vy) < 3.0f && abs(vx) < 3.0f) {
 
+        if (state != AnimState::IDLE) {
+            state = AnimState::IDLE;
+            startFrame = IDLE_ANIMATION_START;
+            updatesPerFrame = 16;
+            frame = 0;
+        }
 
+    }
+    else {
+
+        if (state != AnimState::WALK) {
+            state = AnimState::WALK;
+            startFrame = WALK_ANIMATION_START;
+            updatesPerFrame = 4;
+            frame = 0;
+        }
+    }
+
+    switch (state) {
+    case AnimState::IDLE:
+        if (frame >= (IDLE_ANIMATION) * updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+        case AnimState::WALK:
+        if (frame >= (WALK_ANIMATION) * updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+    }
 
     //check_bounds();
 
@@ -68,7 +108,9 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta) {
 
     /*SDL_RenderCopyEx(renderer, texture, NULL, &dst, angle / M_PI * 180 + 90,
         NULL, SDL_FLIP_NONE);*/
-    SDL_RenderCopyEx(renderer, texture, &anim_rects[0], &dst, angle, NULL, flip);
+    printf("Frame: %d\n", frame);
+    SDL_RenderCopyEx(renderer, texture, &anim_rects[frame/updatesPerFrame + startFrame], &dst, angle, NULL, flip);
+
 }
 
 void Player::handle_inputs(float delta, InputHandler* inputs) {
