@@ -18,11 +18,12 @@ class Player : public GameActor {
 	// General Variables
 	float vx, vy;
 	float linear_accel, friction_coeff;
-	int w, h;
 	float max_speed;
 	float angle;
 	bool alive;
 	int player_num;
+	bool isColliding;
+	float px, py;
 	
 	//Animation Variables
 	const uint16_t IDLE_ANIMATION = 2;
@@ -46,9 +47,9 @@ public:
 	void render(SDL_Renderer* renderer, Resources* resources, float delta);
 	void handle_inputs(float delta, InputHandler* inputs);
 	bool is_alive();
-	const int get_id();
+	const GameActorType get_id();
 	const bool collides();
-	bool does_collide(int id);
+	bool does_collide(GameActorType id);
 	void collide_actor(GameActor* actor);
 	int get_player_num();
 	void load_animations();

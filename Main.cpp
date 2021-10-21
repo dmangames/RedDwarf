@@ -277,6 +277,8 @@ int main(int argc, char* args[])
 				//Handle events on queue
 				while (SDL_PollEvent(&e) != 0)
 				{
+					graphics.render_mainmenu();
+					graphics.present_renderer();
 					//User requests quit
 					if (e.type == SDL_QUIT)
 					{
@@ -290,6 +292,7 @@ int main(int argc, char* args[])
 				}
 				break;
 			case IN_GAME:
+				
 				inputs.update();
 				quit = inputs.get_quit();
 

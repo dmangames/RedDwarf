@@ -29,6 +29,7 @@ public:
 	void update(InputHandler* inputs);
 	float get_delta();
 	std::vector<GameActor*>* get_actors();
+	bool generate_map(int w, int h); //width and height in tiles
 	~World();
 
 };

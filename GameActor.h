@@ -7,11 +7,12 @@
 #include "Resources.h"
 #include "Hitbox.h"
 
-struct Animation {
-	std::string name = "";
-	int startFrame = 0;
-	int frames = 0;
+enum class GameActorType {
+	PLAYER,
+	ENEMY,
+	DESTRUCTABLE
 };
+
 
 class GameActor {
 protected:
@@ -35,6 +36,7 @@ protected:
 //	SDL_Rect* gSpriteClips;
 //	LTexture gSpriteSheetTexture;
 public:
+	GameActor();
 	GameActor(float x, float y, int w, int h, int screen_w, int screen_h);
 	Hitbox* get_hitbox();
 	float get_x();
@@ -47,9 +49,9 @@ public:
 	virtual void update(float delta) = 0;
 	virtual void render(SDL_Renderer* renderer, Resources* resources, float delta) = 0;
 	virtual bool is_alive() = 0;
-	virtual const int get_id() = 0;
+	virtual const GameActorType get_id() = 0;
 	virtual const bool collides() = 0;
-	virtual bool does_collide(int id) = 0;
+	virtual bool does_collide(GameActorType type) = 0;
 	virtual void collide_actor(GameActor* actor) = 0;
 
 

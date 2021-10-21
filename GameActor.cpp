@@ -30,6 +30,16 @@ void GameActor::check_bounds() {
 
 // PUBLIC METHODS
 
+GameActor::GameActor() {
+	x = 0;
+	y = 0;
+	w = 0;
+	h = 0;
+	screen_w = 0;
+	screen_h = 0;
+	hitbox = NULL;
+}
+
 GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h) {
 	x = x;
 	y = y;

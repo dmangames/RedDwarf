@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "world.h"
 #include "Player.h"
+#include "Rock.h"
 
 // STATIC MEMBERS
 
@@ -12,7 +13,7 @@ void World::check_spawn_players() {
 
     bool players_alive[NUM_PLAYERS] = { false };
     for (int i = 0; i < actors.size(); i++) {
-        if (actors[i]->get_id() == 0) {
+        if (actors[i]->get_id() == GameActorType::PLAYER) {
             players_alive[((Player*)actors[i])->get_player_num() - 1] = true;
         }
     }
@@ -38,7 +39,7 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     collision_manager = new CollisionManager(&actors);
     actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors));
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
-
+    generate_map(2, 2);
 }
 
 // Main cycle running game logic (inputs, physics, mechanics, etc.)
@@ -53,7 +54,7 @@ void World::update(InputHandler* inputs) {
     // Handle input
     // Deliver input to each Player
     for (int i = 0; i < actors.size(); i++) {
-        if (actors[i]->get_id() == 0) {
+        if (actors[i]->get_id() == GameActorType::PLAYER) {
             ((Player*)actors[i])->handle_inputs(clock.get_delta(), inputs);
         }
     }
@@ -69,7 +70,7 @@ void World::update(InputHandler* inputs) {
     // Prune dead entities from entites vector
     for (int i = 0; i < actors.size(); i++) {
         if (!actors[i]->is_alive()) {
-            if (actors[i]->get_id() == 0) {
+            if (actors[i]->get_id() == GameActorType::PLAYER) {
                 player_respawn_timers[
                     ((Player*)actors[i])->get_player_num() - 1] = respawn_delay;
             }
@@ -98,6 +99,19 @@ float World::get_delta() {
 
 std::vector<GameActor*>* World::get_actors() {
     return &actors;
+}
+
+bool World::generate_map(int w, int h) {
+    bool success = true;
+
+    for (int i = 0; i < w; ++i) {
+        for (int j = 0; j < h; ++j) {
+            //create a rock
+            actors.push_back(new Rock(i * 32.0f, j * 32.0f, screen_w, screen_h));
+        }
+    }
+
+    return success;
 }
 
 World::~World() {

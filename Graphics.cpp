@@ -59,12 +59,27 @@ Graphics::Graphics() {
 
 void Graphics::clear_screen() {
 	// Clear the screen with a white background
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_SetRenderDrawColor(renderer, 71, 69, 67, 0); // DARK BEIGE
 	SDL_RenderClear(renderer);
 }
 
 void Graphics::render_overlay() {
 	overlay->render_fps(font_renderer, lround(fps_counter.get_fps()));
+}
+
+void Graphics::render_mainmenu() {
+	SDL_Texture* texture;
+	texture = resources->get_texture("main_menu", 1);
+	SDL_Rect dst;
+	dst.x = 0;
+	dst.y = 0;
+	dst.w = SCREEN_WIDTH;
+	dst.h = SCREEN_HEIGHT;
+	SDL_RenderCopy(renderer, texture, NULL, &dst);
+}
+
+void Graphics::present_renderer() {
+	SDL_RenderPresent(renderer);
 }
 
 void Graphics::present_renderer(float delta) {

@@ -7,7 +7,9 @@
 
 Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors)
         : GameActor(x, y, WIDTH, HEIGHT, screen_w, screen_h){
-	this->w = WIDTH;
+    this->x = x;
+    this->y = y;
+    this->w = WIDTH;
 	this->h = HEIGHT;
     hitbox = new Hitbox(0, 0, w, h);
     vx = vy = 0.0f;
@@ -16,10 +18,14 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     max_speed = 300.0f;
     angle = 0;
     alive = true;
+    isColliding = false;
     state = AnimState::IDLE;
     frame = 0;
     startFrame = 0;
     updatesPerFrame = 16;
+
+    px = x;
+    py = y;
 
     this->player_num = player_num;
     this->actors = actors;
@@ -31,9 +37,13 @@ void Player::update(float delta) {
 
     //printf("X Velocity: %4.2f\n", vx);
 
+    px = x;
+    py = y;
+
     // Apply change in x and y directions
     x += delta * vx;
     y += delta * vy;
+
 
     // Enforce speed limit
     if (vx > max_speed) {
@@ -90,7 +100,7 @@ void Player::update(float delta) {
 
     //check_bounds();
 
-    //hitbox->update_pos(x, y, angle);
+    hitbox->update_pos(x, y, angle);
 }
 
 void Player::render(SDL_Renderer* renderer, Resources* resources, float delta) {
@@ -108,9 +118,11 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta) {
 
     /*SDL_RenderCopyEx(renderer, texture, NULL, &dst, angle / M_PI * 180 + 90,
         NULL, SDL_FLIP_NONE);*/
-    printf("Frame: %d\n", frame);
+
     SDL_RenderCopyEx(renderer, texture, &anim_rects[frame/updatesPerFrame + startFrame], &dst, angle, NULL, flip);
 
+    //DEBUG Render hitbox
+    hitbox->render_corners(renderer);
 }
 
 void Player::handle_inputs(float delta, InputHandler* inputs) {
@@ -152,21 +164,35 @@ bool Player::is_alive() {
     return alive;
 }
 
-const int Player::get_id() {
-    return 0;
+const GameActorType Player::get_id() {
+    return GameActorType::PLAYER;
 }
 
 const bool Player::collides() {
     return true;
 }
 
-// Checks for collisions with Missiles
-bool Player::does_collide(int id) {
-    return id == 1 || id == 4;
+// Checks for collisions
+bool Player::does_collide(GameActorType type) {
+    return type == GameActorType::DESTRUCTABLE || type == GameActorType::ENEMY;
 }
 
-void Player::collide_actor(GameActor* actors) {
-
+void Player::collide_actor(GameActor* actor) {
+    switch (actor->get_id()) {
+    case GameActorType::DESTRUCTABLE:
+        printf("Colliding with destructible object.\n");
+        x = px;
+        y = py;
+        break;
+    case GameActorType::ENEMY:
+        printf("Colliding with enemy object.\n");
+        break;
+    case GameActorType::PLAYER:
+        printf("Colliding with player object.\n");
+        break;
+    default:
+        break;
+    }
 
 }
 

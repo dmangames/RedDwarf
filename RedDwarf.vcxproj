@@ -157,12 +157,15 @@
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="DestructibleObject.cpp" />
+    <ClCompile Include="Rock.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clock.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="DestructibleObject.h" />
     <ClInclude Include="FontRenderer.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="GameActor.h" />
@@ -173,6 +176,7 @@
     <ClInclude Include="Overlay.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Resources.h" />
+    <ClInclude Include="Rock.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
