@@ -14,6 +14,7 @@ class Player : public GameActor {
 	
 	// References
 	std::vector<GameActor*>* actors;
+	Camera* camera;
 
 	// General Variables
 	float vx, vy;
@@ -42,9 +43,9 @@ class Player : public GameActor {
 	// Helper Functions
 
 public:
-	Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors);
+	Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors, Camera* camera);
 	void update(float delta);
-	void render(SDL_Renderer* renderer, Resources* resources, float delta);
+	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	void handle_inputs(float delta, InputHandler* inputs);
 	bool is_alive();
 	const GameActorType get_id();

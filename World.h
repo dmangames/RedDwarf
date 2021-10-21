@@ -6,6 +6,7 @@
 #include "CollisionManager.h"
 #include "InputHandler.h"
 #include "Clock.h"
+#include "Camera.h"
 
 #define NUM_PLAYERS 1
 
@@ -18,6 +19,7 @@ class World {
 	int screen_w, screen_h;
 	Clock clock;
 	CollisionManager* collision_manager;
+	Camera* camera;
 	std::vector<GameActor*> actors;
 	float player_respawn_timers[NUM_PLAYERS];
 
@@ -29,6 +31,7 @@ public:
 	void update(InputHandler* inputs);
 	float get_delta();
 	std::vector<GameActor*>* get_actors();
+	Camera* get_camera();
 	bool generate_map(int w, int h); //width and height in tiles
 	~World();
 

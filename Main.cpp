@@ -299,7 +299,7 @@ int main(int argc, char* args[])
 				world.update(&inputs);
 
 				graphics.clear_screen();
-				graphics.render_actors(world.get_actors(), world.get_delta());
+				graphics.render_actors(world.get_actors(), world.get_delta(), world.get_camera());
 				graphics.render_overlay();
 
 				graphics.present_renderer(world.get_delta());

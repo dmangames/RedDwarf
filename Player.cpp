@@ -1,11 +1,14 @@
 #include "Player.h"
 
+#define DEBUG false
+
+
 #define WIDTH 32
 #define HEIGHT 32
 
 // PUBLIC FUNCTIONS
 
-Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors)
+Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors, Camera* camera)
         : GameActor(x, y, WIDTH, HEIGHT, screen_w, screen_h){
     this->x = x;
     this->y = y;
@@ -23,6 +26,8 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     frame = 0;
     startFrame = 0;
     updatesPerFrame = 16;
+
+    this->camera = camera;
 
     px = x;
     py = y;
@@ -101,17 +106,21 @@ void Player::update(float delta) {
     //check_bounds();
 
     hitbox->update_pos(x, y, angle);
+
+    // Update camera
+    camera->setPos((int)x, (int)y);
+    
 }
 
-void Player::render(SDL_Renderer* renderer, Resources* resources, float delta) {
+void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera) {
 	SDL_Texture* texture;
 	texture = resources->get_texture("dwarf", 1);
 
     int texture_width, texture_height;
     SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
     SDL_Rect dst = {
-        (int)x,
-        (int)y,
+        (int)x - camera->get_x_offset(),
+        (int)y - camera->get_y_offset(),
         w,
         h
     };
@@ -122,7 +131,9 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta) {
     SDL_RenderCopyEx(renderer, texture, &anim_rects[frame/updatesPerFrame + startFrame], &dst, angle, NULL, flip);
 
     //DEBUG Render hitbox
-    hitbox->render_corners(renderer);
+    if (DEBUG) {
+        hitbox->render_corners(renderer);
+    }
 }
 
 void Player::handle_inputs(float delta, InputHandler* inputs) {
@@ -183,6 +194,7 @@ void Player::collide_actor(GameActor* actor) {
         printf("Colliding with destructible object.\n");
         x = px;
         y = py;
+        camera->setPos((int)x, (int)y);
         break;
     case GameActorType::ENEMY:
         printf("Colliding with enemy object.\n");

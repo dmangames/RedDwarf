@@ -6,6 +6,7 @@
 #include "LTexture.h"
 #include "Resources.h"
 #include "Hitbox.h"
+#include "Camera.h"
 
 enum class GameActorType {
 	PLAYER,
@@ -47,7 +48,7 @@ public:
 	//GameActor(std::string name, Animation aList[]);
 	virtual ~GameActor() = 0;
 	virtual void update(float delta) = 0;
-	virtual void render(SDL_Renderer* renderer, Resources* resources, float delta) = 0;
+	virtual void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera) = 0;
 	virtual bool is_alive() = 0;
 	virtual const GameActorType get_id() = 0;
 	virtual const bool collides() = 0;

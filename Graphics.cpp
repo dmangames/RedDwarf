@@ -87,9 +87,9 @@ void Graphics::present_renderer(float delta) {
 	fps_counter.count(delta);
 }
 
-void Graphics::render_actors(std::vector<GameActor*>* actors, float delta) {
+void Graphics::render_actors(std::vector<GameActor*>* actors, float delta, Camera* camera) {
 	for (int i = 0; i < actors->size(); ++i) {
-		(*actors)[i]->render(renderer, resources, delta);
+		(*actors)[i]->render(renderer, resources, delta, camera);
 	}
 }
 

@@ -24,7 +24,7 @@ void World::check_spawn_players() {
             int spawn_x = ((float)rand()) / RAND_MAX * (screen_w - 64);
             int spawn_y = ((float)rand()) / RAND_MAX * (screen_h - 64);
 
-            actors.push_back(new Player(spawn_x, spawn_y, i + 1, screen_w, screen_h, &actors));
+            actors.push_back(new Player(spawn_x, spawn_y, i + 1, screen_w, screen_h, &actors, camera));
         }
     }
 
@@ -37,7 +37,8 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     this->screen_w = screen_w;
     this->screen_h = screen_h;
     collision_manager = new CollisionManager(&actors);
-    actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors));
+    camera = new Camera(screen_w, screen_h);
+    actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
     generate_map(2, 2);
 }
@@ -99,6 +100,10 @@ float World::get_delta() {
 
 std::vector<GameActor*>* World::get_actors() {
     return &actors;
+}
+
+Camera* World::get_camera() {
+    return camera;
 }
 
 bool World::generate_map(int w, int h) {
