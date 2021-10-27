@@ -1,4 +1,5 @@
 #include "Fist.h"
+#include "Rock.h"
 
 #define DEBUG true
 
@@ -24,8 +25,11 @@ void Fist::render(SDL_Renderer* renderer, Resources* resources, float delta, Cam
 
 void Fist::collide_actor(GameActor* actor)
 {
-	if (actor->get_id() == GameActorType::DESTRUCTABLE) {
+	if (actor->get_id() == GameActorType::ROCK && active) {
 		//Apply next layer of destruction
 		printf("Applying Damage from Fist!\n");
+		actor->take_damage(1);
+		set_active(false);
+		printf("Set active to %d\n", is_active());
 	}
 }

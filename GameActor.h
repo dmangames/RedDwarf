@@ -12,7 +12,8 @@ enum class GameActorType {
 	PLAYER,
 	ENEMY,
 	DESTRUCTABLE,
-	WEAPON
+	WEAPON,
+	ROCK
 };
 
 
@@ -22,6 +23,7 @@ protected:
 	int w, h;
 	int screen_w, screen_h;
 	Hitbox* hitbox;
+	bool active; // Used to toggle if world should take this actor into account
 	float get_center_x();
 	float get_center_y();
 	void check_bounds();
@@ -45,6 +47,8 @@ public:
 	float get_y();
 	void set_x(float x);
 	void set_y(float y);
+	void set_active(bool isActive);
+	bool is_active();
 	//GameActor(std::string name, int idleFrames = 0, int walkingFrames = 0);
 	//GameActor(std::string name, Animation aList[]);
 	virtual ~GameActor() = 0;
@@ -55,6 +59,7 @@ public:
 	virtual const bool collides() = 0;
 	virtual bool does_collide(GameActorType type) = 0;
 	virtual void collide_actor(GameActor* actor) = 0;
+	virtual void take_damage(int damage) = 0;
 
 
 

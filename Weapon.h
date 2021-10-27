@@ -6,7 +6,6 @@ class Weapon :public GameActor {
 
 
 	// General Variables
-	bool active;
 	bool alive;
 
 
@@ -19,5 +18,5 @@ public:
 	const bool collides();
 	bool does_collide(GameActorType type);
 	virtual void collide_actor(GameActor* actor) = 0;
-	void set_active(bool isActive);
+	void take_damage(int damage);
 };

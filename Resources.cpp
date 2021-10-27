@@ -71,7 +71,7 @@ void Resources::load_resources() {
 	// TEXTURES
 	load_texture(&textures["main_menu"][1], "red_dwarf_main_menu_art.png");
 	load_texture(&textures["dwarf"][1], "dwarf.png");
-	load_texture(&textures["redrock"][1], "redrock.png");
+	load_texture(&textures["redrock"][1], "redrock_ss.png");
 }
 
 TTF_Font* Resources::get_font(std::string name) {

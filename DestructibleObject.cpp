@@ -32,10 +32,19 @@ bool DestructibleObject::does_collide(GameActorType id)
 	return id == GameActorType::PLAYER || id == GameActorType::ENEMY;
 }
 
+
 void DestructibleObject::collide_actor(GameActor* actor)
 {
 }
 
 bool DestructibleObject::is_alive() {
 	return alive;
+}
+
+int DestructibleObject::get_damage_taken() {
+	return damage_taken;
+}
+
+int DestructibleObject::get_health() {
+	return health;
 }

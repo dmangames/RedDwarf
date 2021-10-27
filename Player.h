@@ -66,4 +66,5 @@ public:
 	void collide_actor(GameActor* actor);
 	int get_player_num();
 	void load_animations();
+	void take_damage(int damage);
 };

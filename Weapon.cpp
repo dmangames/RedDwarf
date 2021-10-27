@@ -30,13 +30,17 @@ const bool Weapon::collides()
 
 bool Weapon::does_collide(GameActorType id)
 {
-	return id == GameActorType::DESTRUCTABLE || id == GameActorType::ENEMY;
+	return id == GameActorType::DESTRUCTABLE
+		|| id == GameActorType::ENEMY
+		|| id == GameActorType::ROCK;
 }
 
 bool Weapon::is_alive() {
 	return alive;
 }
 
-void Weapon::set_active(bool isActive) {
-	active = isActive;
+
+void Weapon::take_damage(int damage)
+{
+	// Usually no damage taken
 }

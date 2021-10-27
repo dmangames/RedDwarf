@@ -119,16 +119,19 @@ bool check_hitboxes(Hitbox* h1, Hitbox* h2) {
 void CollisionManager::check_collisions() {
 
 	for (int i = 0; i < actors->size(); i++) {
-		if ((*actors)[i]->collides()) {
+		if ((*actors)[i]->collides() && (*actors)[i]->is_active()) {
 			for (int j = 0; j < actors->size(); j++) {
 				// Make sure not to check it against itself
 				if (j != i) {
 					if ((*actors)[i]->does_collide((*actors)[j]->get_id())) {
 						// Do the hitboxes overlap?
 						if (check_hitboxes((*actors)[i]->get_hitbox(), (*actors)[j]->get_hitbox())) {
-							// If so, notify the entites
-							(*actors)[i]->collide_actor((*actors)[j]);
-							(*actors)[j]->collide_actor((*actors)[i]);
+							// If so, notify the entites if both entities are active
+							if ((*actors)[i]->is_active() && (*actors)[j]->is_active()) {
+								(*actors)[i]->collide_actor((*actors)[j]);
+								(*actors)[j]->collide_actor((*actors)[i]);
+							}
+							
 						}
 					}
 				}

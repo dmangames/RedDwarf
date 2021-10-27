@@ -131,7 +131,7 @@ void Player::update(float delta) {
             }
             else {
                 frame++;
-                if (frame / updatesPerFrame + startFrame == 15) {
+                if (frame == PUNCH_ANIMATION * updatesPerFrame - 15) {
                     // Activate the fist
                     if (flip == SDL_FLIP_HORIZONTAL) {
                         fist->set_x(this->x + 33);
@@ -246,13 +246,20 @@ const bool Player::collides() {
 
 // Checks for collisions
 bool Player::does_collide(GameActorType type) {
-    return type == GameActorType::DESTRUCTABLE || type == GameActorType::ENEMY;
+    return type == GameActorType::DESTRUCTABLE 
+        || type == GameActorType::ENEMY 
+        || type == GameActorType::ROCK;
 }
 
 void Player::collide_actor(GameActor* actor) {
     switch (actor->get_id()) {
     case GameActorType::DESTRUCTABLE:
         //printf("Colliding with destructible object.\n");
+        x = px;
+        y = py;
+        camera->setPos((int)x, (int)y);
+        break;
+    case GameActorType::ROCK:
         x = px;
         y = py;
         camera->setPos((int)x, (int)y);
@@ -271,6 +278,11 @@ void Player::collide_actor(GameActor* actor) {
 
 int Player::get_player_num() {
     return player_num;
+}
+
+void Player::take_damage(int damage)
+{
+    //TODO:make player take damage
 }
 
 void Player::load_animations() {

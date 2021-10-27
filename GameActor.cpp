@@ -38,6 +38,7 @@ GameActor::GameActor() {
 	screen_w = 0;
 	screen_h = 0;
 	hitbox = NULL;
+	active = true;
 }
 
 GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h) {
@@ -48,6 +49,7 @@ GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h)
 	screen_w = screen_w;
 	screen_h = screen_h;
 	hitbox = NULL;
+	active = true;
 }
 
 Hitbox* GameActor::get_hitbox() {
@@ -70,6 +72,13 @@ void GameActor::set_y(float y) {
 	this->y = y;
 }
 
+void GameActor::set_active(bool isActive) {
+	this->active = isActive;
+}
+
+bool GameActor::is_active() {
+	return active;
+}
 
 GameActor::~GameActor() {
 	if (hitbox != NULL) {
