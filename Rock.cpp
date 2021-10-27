@@ -1,6 +1,6 @@
 #include "Rock.h"
 
-#define DEBUG false
+#define DEBUG true
 
 #define WIDTH 32
 #define HEIGHT 32
@@ -28,6 +28,6 @@ void Rock::render(SDL_Renderer* renderer, Resources* resources, float delta, Cam
 
 	//DEBUG Render hitbox
 	if (DEBUG) {
-		hitbox->render_corners(renderer);
+		hitbox->render_corners(renderer, camera);
 	}
 }

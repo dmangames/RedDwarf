@@ -81,16 +81,16 @@ void Hitbox::update_pos(float x, float y, float angle) {
 }
 
 // Debug method to draw corners
-void Hitbox::render_corners(SDL_Renderer* renderer) {
+void Hitbox::render_corners(SDL_Renderer* renderer, Camera* camera) {
 
 	// Set draw color
 	SDL_SetRenderDrawColor(renderer, POINT_R, POINT_G, POINT_B, POINT_A);
 
 	// Create rectangles over each corner
-	SDL_Rect tl_rect = { tl.x - POINT_SIZE / 2, tl.y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect tr_rect = { tr.x - POINT_SIZE / 2, tr.y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect bl_rect = { bl.x - POINT_SIZE / 2, bl.y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect br_rect = { br.x - POINT_SIZE / 2, br.y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+	SDL_Rect tl_rect = { tl.x - camera->get_x_offset() - POINT_SIZE / 2, tl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+	SDL_Rect tr_rect = { tr.x - camera->get_x_offset() - POINT_SIZE / 2, tr.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+	SDL_Rect bl_rect = { bl.x - camera->get_x_offset() - POINT_SIZE / 2, bl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+	SDL_Rect br_rect = { br.x - camera->get_x_offset() - POINT_SIZE / 2, br.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
 
 	// Draw rectangles
 	SDL_RenderFillRect(renderer, &tl_rect);

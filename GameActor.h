@@ -11,7 +11,8 @@
 enum class GameActorType {
 	PLAYER,
 	ENEMY,
-	DESTRUCTABLE
+	DESTRUCTABLE,
+	WEAPON
 };
 
 

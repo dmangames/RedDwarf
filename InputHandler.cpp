@@ -58,5 +58,7 @@ void InputHandler::update() {
 }
 
 bool InputHandler::is_key_down(int key) {
+    //if(key_states[key])
+    //    printf("Key pressed: %d\n", key);
     return key_states[key];
 }

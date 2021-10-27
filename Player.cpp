@@ -1,10 +1,41 @@
 #include "Player.h"
 
-#define DEBUG false
+#define DEBUG true
 
 
 #define WIDTH 32
 #define HEIGHT 32
+
+//PRIVATE FUNCTIONS
+
+void Player::setAnimState(AnimState s) {
+    switch (s) {
+    case AnimState::IDLE:
+         if (state != AnimState::IDLE) {
+            state = AnimState::IDLE;
+            startFrame = IDLE_ANIMATION_START;
+            updatesPerFrame = IDLE_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    case AnimState::WALK:
+        if (state != AnimState::WALK) {
+            state = AnimState::WALK;
+            startFrame = WALK_ANIMATION_START;
+            updatesPerFrame = WALK_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    case AnimState::PUNCH:
+        if (state != AnimState::PUNCH) {
+            state = AnimState::PUNCH;
+            startFrame = PUNCH_ANIMATION_START;
+            updatesPerFrame = PUNCH_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    }
+}
 
 // PUBLIC FUNCTIONS
 
@@ -15,6 +46,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     this->w = WIDTH;
 	this->h = HEIGHT;
     hitbox = new Hitbox(0, 0, w, h);
+    fist = new Fist(0, 0, 10, 10, screen_w, screen_h);
     vx = vy = 0.0f;
     linear_accel = 500.0f;
     friction_coeff = 0.8f;
@@ -34,6 +66,8 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 
     this->player_num = player_num;
     this->actors = actors;
+
+    actors->push_back(fist);
 
     load_animations();
 }
@@ -64,48 +98,63 @@ void Player::update(float delta) {
         vy = -max_speed;
     }
 
-    if (abs(vy) < 3.0f && abs(vx) < 3.0f) {
-
-        if (state != AnimState::IDLE) {
-            state = AnimState::IDLE;
-            startFrame = IDLE_ANIMATION_START;
-            updatesPerFrame = 16;
-            frame = 0;
-        }
+    if (state == AnimState::PUNCH) {
 
     }
+    else if (abs(vy) < 3.0f && abs(vx) < 3.0f) {
+        setAnimState(AnimState::IDLE);
+    }
     else {
-
-        if (state != AnimState::WALK) {
-            state = AnimState::WALK;
-            startFrame = WALK_ANIMATION_START;
-            updatesPerFrame = 4;
-            frame = 0;
-        }
+        setAnimState(AnimState::WALK);
     }
 
     switch (state) {
-    case AnimState::IDLE:
-        if (frame >= (IDLE_ANIMATION) * updatesPerFrame - 1) {
-            frame = 0;
-        }
-        else {
-            frame++;
-        }
-        break;
+        case AnimState::IDLE:
+            if (frame >= (IDLE_ANIMATION) * updatesPerFrame - 1) {
+                frame = 0;
+            }
+            else {
+                frame++;
+            }
+            break;
         case AnimState::WALK:
-        if (frame >= (WALK_ANIMATION) * updatesPerFrame - 1) {
-            frame = 0;
-        }
-        else {
-            frame++;
-        }
-        break;
+            if (frame >= (WALK_ANIMATION) * updatesPerFrame - 1) {
+                frame = 0;
+            }
+            else {
+                frame++;
+            }
+            break;
+        case AnimState::PUNCH:
+            if (frame >= (PUNCH_ANIMATION) * updatesPerFrame - 1) {
+                setAnimState(AnimState::IDLE);
+            }
+            else {
+                frame++;
+                if (frame / updatesPerFrame + startFrame == 15) {
+                    // Activate the fist
+                    if (flip == SDL_FLIP_HORIZONTAL) {
+                        fist->set_x(this->x + 33);
+                        fist->set_y(this->y + 12);
+                    }
+                    else {
+                        fist->set_x(this->x - 10);
+                        fist->set_y(this->y + 12);
+                    }
+                    fist->update(delta);
+                    fist->set_active(true);
+                }
+                else {
+                    fist->set_active(false);
+                }
+            }
+            break;
     }
 
     //check_bounds();
 
     hitbox->update_pos(x, y, angle);
+
 
     // Update camera
     camera->setPos((int)x, (int)y);
@@ -128,11 +177,13 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, C
     /*SDL_RenderCopyEx(renderer, texture, NULL, &dst, angle / M_PI * 180 + 90,
         NULL, SDL_FLIP_NONE);*/
 
+    
     SDL_RenderCopyEx(renderer, texture, &anim_rects[frame/updatesPerFrame + startFrame], &dst, angle, NULL, flip);
 
     //DEBUG Render hitbox
     if (DEBUG) {
-        hitbox->render_corners(renderer);
+        hitbox->render_corners(renderer, camera);
+        fist->render(renderer, resources, delta, camera);
     }
 }
 
@@ -168,6 +219,16 @@ void Player::handle_inputs(float delta, InputHandler* inputs) {
             vx *= friction_coeff;
             vy *= friction_coeff;
         }
+
+        // ACTIONS
+        if (inputs->is_key_down(KEY_P1_PUNCH)) {
+            if (state != AnimState::PUNCH) {
+                state = AnimState::PUNCH;
+                startFrame = PUNCH_ANIMATION_START;
+                updatesPerFrame = 4;
+                frame = 0;
+            }
+        }
     }
 }
 
@@ -191,7 +252,7 @@ bool Player::does_collide(GameActorType type) {
 void Player::collide_actor(GameActor* actor) {
     switch (actor->get_id()) {
     case GameActorType::DESTRUCTABLE:
-        printf("Colliding with destructible object.\n");
+        //printf("Colliding with destructible object.\n");
         x = px;
         y = py;
         camera->setPos((int)x, (int)y);
@@ -265,5 +326,43 @@ void Player::load_animations() {
 		anim_rects[9].y = 0;
 		anim_rects[9].w = 32;
 		anim_rects[9].h = 32;
+
+        // PUNCH
+        anim_rects[10].x = 320;
+        anim_rects[10].y = 0;
+        anim_rects[10].w = 32;
+        anim_rects[10].h = 32;
+
+        anim_rects[11].x = 352;
+        anim_rects[11].y = 0;
+        anim_rects[11].w = 32;
+        anim_rects[11].h = 32;
+
+        anim_rects[12].x = 384;
+        anim_rects[12].y = 0;
+        anim_rects[12].w = 32;
+        anim_rects[12].h = 32;
+
+        anim_rects[13].x = 416;
+        anim_rects[13].y = 0;
+        anim_rects[13].w = 32;
+        anim_rects[13].h = 32;
+
+        anim_rects[14].x = 448;
+        anim_rects[14].y = 0;
+        anim_rects[14].w = 32;
+        anim_rects[14].h = 32;
+
+        anim_rects[15].x = 480;
+        anim_rects[15].y = 0;
+        anim_rects[15].w = 32;
+        anim_rects[15].h = 32;
+
+        anim_rects[16].x = 512;
+        anim_rects[16].y = 0;
+        anim_rects[16].w = 32;
+        anim_rects[16].h = 32;
+
+
 
 }

@@ -148,6 +148,7 @@
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Fist.cpp" />
     <ClCompile Include="FontRenderer.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
     <ClCompile Include="GameActor.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="DestructibleObject.cpp" />
     <ClCompile Include="Rock.cpp" />
+    <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +170,7 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="DestructibleObject.h" />
+    <ClInclude Include="Fist.h" />
     <ClInclude Include="FontRenderer.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="GameActor.h" />
@@ -179,6 +182,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="Rock.h" />
+    <ClInclude Include="Weapon.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

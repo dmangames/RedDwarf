@@ -4,10 +4,12 @@
 #include "GameActor.h"
 #include "Hitbox.h"
 #include "InputHandler.h"
+#include "Fist.h"
 
 enum class AnimState {
 	IDLE,
 	WALK,
+	PUNCH
 };
 
 class Player : public GameActor {
@@ -25,14 +27,22 @@ class Player : public GameActor {
 	int player_num;
 	bool isColliding;
 	float px, py;
+	Fist* fist;
+	
+
 	
 	//Animation Variables
 	const uint16_t IDLE_ANIMATION = 2;
 	const uint16_t IDLE_ANIMATION_START = 0;
+	const uint16_t IDLE_UPDATE_RATE = 16;
 	const uint16_t WALK_ANIMATION = 8;
 	const uint16_t WALK_ANIMATION_START = 2;
-	const uint16_t TOTAL_ANIMATION = 10;
-	SDL_Rect anim_rects[10];
+	const uint16_t WALK_UPDATE_RATE = 4;
+	const uint16_t PUNCH_ANIMATION = 7;
+	const uint16_t PUNCH_ANIMATION_START = 10;
+	const uint16_t PUNCH_UPDATE_RATE = 4;
+	const uint16_t TOTAL_ANIMATION = 17;
+	SDL_Rect anim_rects[17];
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	int frame;
 	int startFrame;
@@ -41,6 +51,8 @@ class Player : public GameActor {
 
 
 	// Helper Functions
+
+	void setAnimState(AnimState state);
 
 public:
 	Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors, Camera* camera);
