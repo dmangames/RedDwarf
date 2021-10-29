@@ -92,26 +92,65 @@ bool test_axis(Hitbox* h1, Hitbox* h2, SDL_Point axis) {
 //
 //}
 
+// CIRCLE/RECTANGLE
+bool circleRect(Hitbox* circle, Hitbox* rect) {
+	float cx = circle->get_center_x();
+	float cy = circle->get_center_y();
+	float radius = circle->get_circle_radius();
+	float rx = rect->get_x();
+	float ry = rect->get_y();
+	float rw = rect->get_width();
+	float rh = rect->get_height();
+
+	// temporary variables to set edges for testing
+	float testX = cx;
+	float testY = cy;
+
+	// which edge is closest?
+	if (cx < rx)         testX = rx;      // test left edge
+	else if (cx > rx + rw) testX = rx + rw;   // right edge
+	if (cy < ry)         testY = ry;      // top edge
+	else if (cy > ry + rh) testY = ry + rh;   // bottom edge
+
+	// get distance from closest edges
+	float distX = cx - testX;
+	float distY = cy - testY;
+	float distance = (distX * distX) + (distY * distY);
+
+	// if the distance is less than the radius, collision!
+	if (distance <= radius) {
+		return true;
+	}
+	return false;
+}
+
 // Returns true if two hitboxes are overlapping
 bool check_hitboxes(Hitbox* h1, Hitbox* h2) {
-
-	// Check by radius method to avoid expensive Separating Axis Method when possible
-	// Calculate distance of each center
-	float center_distance = pow(h1->get_center_x() - h2->get_center_x(), 2.0f) + pow(h1->get_center_y() - h2->get_center_y(), 2.0f);
-
-	// Add radii from both hitboxes
-	float total_radii = h1->get_radius() + h2->get_radius();
-	if (total_radii > center_distance) {
-		
-		// Simple rect intesect with no rotation
-		// https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
-		return !(h2->get_tl().x > h1->get_tr().x
-			|| h2->get_tr().x < h1->get_tl().x
-			|| h2->get_tl().y > h1->get_bl().y
-			|| h2->get_bl().y < h1->get_tl().y);
+	if (h1->get_type() == HitboxType::CIRCLE && h2->get_type() == HitboxType::RECT) {
+		return circleRect(h1, h2);
 	}
+	else if(h1->get_type() == HitboxType::RECT && h2->get_type() == HitboxType::CIRCLE){
+		return circleRect(h2, h1);
+	}
+	else {
+		// Check by radius method to avoid expensive Separating Axis Method when possible
+// Calculate distance of each center
+		float center_distance = pow(h1->get_center_x() - h2->get_center_x(), 2.0f) + pow(h1->get_center_y() - h2->get_center_y(), 2.0f);
 
-	return false;
+		// Add radii from both hitboxes
+		float total_radii = h1->get_radius() + h2->get_radius();
+		if (total_radii > center_distance) {
+
+			// Simple rect intesect with no rotation
+			// https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
+			return !(h2->get_tl().x > h1->get_tr().x
+				|| h2->get_tr().x < h1->get_tl().x
+				|| h2->get_tl().y > h1->get_bl().y
+				|| h2->get_bl().y < h1->get_tl().y);
+		}
+
+		return false;
+	}
 
 }
 

@@ -20,13 +20,15 @@ void rotate_point(int* x, int* y, float angle) {
 
 // PUBLIC FUNCTIONS
 
-Hitbox::Hitbox(float x_offset, float y_offset, int w, int h) {
+Hitbox::Hitbox(float x_offset, float y_offset, int w, int h, HitboxType type) {
 
 	this->x_offset = x_offset;
 	this->y_offset = y_offset;
 	this->w = w;
 	this->h = h;
 	radius = pow(w, 2) + pow(h, 2);
+	circle_radius = pow(w / 2, 2) + pow(h / 2, 2);
+	this->type = type;
 
 }
 
@@ -80,23 +82,65 @@ void Hitbox::update_pos(float x, float y, float angle) {
 
 }
 
+void DrawCircle(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_t radius)
+{
+	const int32_t diameter = (radius * 2);
+
+	int32_t x = (radius - 1);
+	int32_t y = 0;
+	int32_t tx = 1;
+	int32_t ty = 1;
+	int32_t error = (tx - diameter);
+
+	while (x >= y)
+	{
+		//  Each of the following renders an octant of the circle
+		SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
+		SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
+		SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
+		SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
+		SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
+		SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
+		SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+		SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
+
+		if (error <= 0)
+		{
+			++y;
+			error += ty;
+			ty += 2;
+		}
+
+		if (error > 0)
+		{
+			--x;
+			tx += 2;
+			error += (tx - diameter);
+		}
+	}
+}
+
 // Debug method to draw corners
 void Hitbox::render_corners(SDL_Renderer* renderer, Camera* camera) {
+	if (this->type == HitboxType::RECT) {
+		// Set draw color
+		SDL_SetRenderDrawColor(renderer, POINT_R, POINT_G, POINT_B, POINT_A);
 
-	// Set draw color
-	SDL_SetRenderDrawColor(renderer, POINT_R, POINT_G, POINT_B, POINT_A);
+		// Create rectangles over each corner
+		SDL_Rect tl_rect = { tl.x - camera->get_x_offset() - POINT_SIZE / 2, tl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+		SDL_Rect tr_rect = { tr.x - camera->get_x_offset() - POINT_SIZE / 2, tr.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+		SDL_Rect bl_rect = { bl.x - camera->get_x_offset() - POINT_SIZE / 2, bl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
+		SDL_Rect br_rect = { br.x - camera->get_x_offset() - POINT_SIZE / 2, br.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
 
-	// Create rectangles over each corner
-	SDL_Rect tl_rect = { tl.x - camera->get_x_offset() - POINT_SIZE / 2, tl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect tr_rect = { tr.x - camera->get_x_offset() - POINT_SIZE / 2, tr.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect bl_rect = { bl.x - camera->get_x_offset() - POINT_SIZE / 2, bl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-	SDL_Rect br_rect = { br.x - camera->get_x_offset() - POINT_SIZE / 2, br.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
-
-	// Draw rectangles
-	SDL_RenderFillRect(renderer, &tl_rect);
-	SDL_RenderFillRect(renderer, &tr_rect);
-	SDL_RenderFillRect(renderer, &bl_rect);
-	SDL_RenderFillRect(renderer, &br_rect);
+		// Draw rectangles
+		SDL_RenderFillRect(renderer, &tl_rect);
+		SDL_RenderFillRect(renderer, &tr_rect);
+		SDL_RenderFillRect(renderer, &bl_rect);
+		SDL_RenderFillRect(renderer, &br_rect);
+	}
+	else if (this->type == HitboxType::CIRCLE) {
+		DrawCircle(renderer, get_center_x() - camera->get_x_offset(), get_center_y() - camera->get_y_offset(), sqrt(circle_radius));
+	}
 
 }
 
@@ -110,6 +154,10 @@ int Hitbox::get_center_y() {
 
 float Hitbox::get_radius() {
 	return radius;
+}
+
+float Hitbox::get_circle_radius() {
+	return circle_radius;
 }
 
 SDL_Point Hitbox::get_tl() {
@@ -126,4 +174,24 @@ SDL_Point Hitbox::get_bl() {
 
 SDL_Point Hitbox::get_br() {
 	return br;
+}
+
+float Hitbox::get_width() {
+	return w;
+}
+
+float Hitbox::get_height() {
+	return h;
+}
+
+float Hitbox::get_x() {
+	return x;
+}
+
+float Hitbox::get_y() {
+	return y;
+}
+
+HitboxType Hitbox::get_type() {
+	return type;
 }

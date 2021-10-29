@@ -28,6 +28,8 @@ class Player : public GameActor {
 	bool isColliding;
 	float px, py;
 	Fist* fist;
+
+	float slideX, slideY;
 	
 
 	
@@ -53,6 +55,7 @@ class Player : public GameActor {
 	// Helper Functions
 
 	void setAnimState(AnimState state);
+	void calculate_slide(float ax, float ay);
 
 public:
 	Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors, Camera* camera);

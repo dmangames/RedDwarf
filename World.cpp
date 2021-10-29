@@ -2,6 +2,7 @@
 #include "world.h"
 #include "Player.h"
 #include "Rock.h"
+#include <vector>
 
 // STATIC MEMBERS
 
@@ -38,7 +39,9 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     this->screen_h = screen_h;
     collision_manager = new CollisionManager(&actors);
     camera = new Camera(screen_w, screen_h);
-    actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
+    map_generator = new MapGenerator(screen_w/32, screen_h/32, 50);
+    //actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
+    actors.push_back(new Player(-50, -50, 1, screen_w, screen_h, &actors, camera));
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
     generate_map(2, 2);
 }
@@ -109,10 +112,14 @@ Camera* World::get_camera() {
 bool World::generate_map(int w, int h) {
     bool success = true;
 
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < h; ++j) {
+    map_generator->generate_map();
+    std::vector<std::vector<int>>* map = map_generator->get_map();
+
+    for (int i = 0; i < map->size(); ++i) {
+        for (int j = 0; j < (*map)[0].size(); ++j) {
             //create a rock
-            actors.push_back(new Rock(i * 32.0f, j * 32.0f, screen_w, screen_h));
+            if((*map)[i][j] == 1)
+                actors.push_back(new Rock(i * 32.0f, j * 32.0f, screen_w, screen_h));
         }
     }
 
@@ -131,4 +138,11 @@ World::~World() {
     delete collision_manager;
     collision_manager = NULL;
 
+    // Free Camera
+    delete camera;
+    camera = NULL;
+
+    // Free map generator
+    delete map_generator;
+    map_generator = NULL;
 }

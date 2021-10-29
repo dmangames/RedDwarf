@@ -154,6 +154,7 @@
     <ClCompile Include="GameActor.cpp" />
     <ClCompile Include="Hitbox.cpp" />
     <ClCompile Include="InputHandler.cpp" />
+    <ClCompile Include="MapGenerator.cpp" />
     <ClCompile Include="Overlay.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Resources.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Hitbox.h" />
     <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="MapGenerator.h" />
     <ClInclude Include="MoveCommand.h" />
     <ClInclude Include="Overlay.h" />
     <ClInclude Include="Player.h" />

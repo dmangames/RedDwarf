@@ -7,6 +7,7 @@
 #include "InputHandler.h"
 #include "Clock.h"
 #include "Camera.h"
+#include "MapGenerator.h"
 
 #define NUM_PLAYERS 1
 
@@ -20,6 +21,7 @@ class World {
 	Clock clock;
 	CollisionManager* collision_manager;
 	Camera* camera;
+	MapGenerator* map_generator;
 	std::vector<GameActor*> actors;
 	float player_respawn_timers[NUM_PLAYERS];
 

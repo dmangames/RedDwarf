@@ -5,6 +5,8 @@
 
 #define WIDTH 32
 #define HEIGHT 32
+#define XOFFSET 16
+#define YOFFSET 16
 
 //PRIVATE FUNCTIONS
 
@@ -45,7 +47,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     this->y = y;
     this->w = WIDTH;
 	this->h = HEIGHT;
-    hitbox = new Hitbox(0, 0, w, h);
+    hitbox = new Hitbox(XOFFSET/2, YOFFSET/2, w - XOFFSET, h - YOFFSET, HitboxType::CIRCLE);
     fist = new Fist(0, 0, 10, 10, screen_w, screen_h);
     vx = vy = 0.0f;
     linear_accel = 500.0f;
@@ -76,12 +78,35 @@ void Player::update(float delta) {
 
     //printf("X Velocity: %4.2f\n", vx);
 
-    px = x;
-    py = y;
 
-    // Apply change in x and y directions
-    x += delta * vx;
-    y += delta * vy;
+
+    if (isColliding) {
+        printf("COLLIDING\n");
+        // Apply change in x and y directions plus slide to the old position
+        x = px + delta * (vx + slideX);
+        y = py + delta * (vy + slideY);
+        //isColliding = false;
+    }
+    else {
+        px = x;
+        py = y;
+        // Apply change in x and y directions
+        x += delta * vx;
+        y += delta * vy;
+    }
+
+    //x += delta * slideX;
+    //y += delta * slideY;
+
+    if (!isColliding) {
+        slideX = 0;
+        slideY = 0;
+    }
+    else {
+        isColliding = false;
+    }
+
+
 
 
     // Enforce speed limit
@@ -215,7 +240,7 @@ void Player::handle_inputs(float delta, InputHandler* inputs) {
                 flip = SDL_FLIP_NONE;
             }
         }
-        if (activate_friction) {
+        if (activate_friction || isColliding) {
             vx *= friction_coeff;
             vy *= friction_coeff;
         }
@@ -262,6 +287,9 @@ void Player::collide_actor(GameActor* actor) {
     case GameActorType::ROCK:
         x = px;
         y = py;
+        isColliding = true;
+        calculate_slide(actor->get_hitbox()->get_center_x(), actor->get_hitbox()->get_center_y());
+
         camera->setPos((int)x, (int)y);
         break;
     case GameActorType::ENEMY:
@@ -274,6 +302,17 @@ void Player::collide_actor(GameActor* actor) {
         break;
     }
 
+}
+
+void Player::calculate_slide(float ax, float ay) {
+
+    float distX = get_center_x() - ax;
+    float distY = get_center_y() - ay;
+    float magnitude = sqrt(pow(distX, 2) + pow(distY, 2));
+    float dirX = distX / magnitude;
+    float dirY = distY / magnitude;
+    slideX += dirX;
+    slideY += dirY;
 }
 
 int Player::get_player_num() {
