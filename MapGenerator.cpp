@@ -34,6 +34,22 @@ void MapGenerator::generate_map() {
 	random_fill_map();
 }
 
+SDL_Point* MapGenerator::get_random_empty_cell()
+{
+	SDL_Point* empty_cell = nullptr;
+	srand(time(NULL));
+	while (empty_cell == nullptr) {
+		int rx = rand() % width;
+		int ry = rand() % height;
+		if ((*map)[rx][ry] == 0) {
+			empty_cell = new SDL_Point();
+			empty_cell->x = rx;
+			empty_cell->y = ry;
+		}
+	}
+	return empty_cell;
+}
+
 std::vector<std::vector<int>>* MapGenerator::get_map()
 {
 	return map;

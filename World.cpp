@@ -39,11 +39,18 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     this->screen_h = screen_h;
     collision_manager = new CollisionManager(&actors);
     camera = new Camera(screen_w, screen_h);
-    map_generator = new MapGenerator(screen_w/32, screen_h/32, 50);
+    map_generator = new MapGenerator(screen_w/32 + 10, screen_h/32 + 10, 50);
+    generate_map();
+
     //actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
-    actors.push_back(new Player(-50, -50, 1, screen_w, screen_h, &actors, camera));
+    SDL_Point* spawn_point = map_generator->get_random_empty_cell();
+    actors.push_back(new Player(spawn_point->x * 32, spawn_point->y * 32, 1, screen_w, screen_h, &actors, camera));
+
+
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
-    generate_map(2, 2);
+
+
+    delete spawn_point;
 }
 
 // Main cycle running game logic (inputs, physics, mechanics, etc.)
@@ -109,7 +116,7 @@ Camera* World::get_camera() {
     return camera;
 }
 
-bool World::generate_map(int w, int h) {
+bool World::generate_map() {
     bool success = true;
 
     map_generator->generate_map();
