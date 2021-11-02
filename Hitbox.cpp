@@ -29,7 +29,7 @@ Hitbox::Hitbox(float x_offset, float y_offset, int w, int h, HitboxType type) {
 	radius = pow(w, 2) + pow(h, 2);
 	circle_radius = pow(w / 2, 2) + pow(h / 2, 2);
 	this->type = type;
-
+	this->rect = new SDL_Rect();
 }
 
 // Given new coordinates and angle, update hitbox corners
@@ -122,9 +122,9 @@ void DrawCircle(SDL_Renderer* renderer, int32_t centreX, int32_t centreY, int32_
 
 // Debug method to draw corners
 void Hitbox::render_corners(SDL_Renderer* renderer, Camera* camera) {
+	// Set draw color
+	SDL_SetRenderDrawColor(renderer, POINT_R, POINT_G, POINT_B, POINT_A);
 	if (this->type == HitboxType::RECT) {
-		// Set draw color
-		SDL_SetRenderDrawColor(renderer, POINT_R, POINT_G, POINT_B, POINT_A);
 
 		// Create rectangles over each corner
 		SDL_Rect tl_rect = { tl.x - camera->get_x_offset() - POINT_SIZE / 2, tl.y - camera->get_y_offset() - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE };
@@ -194,4 +194,13 @@ float Hitbox::get_y() {
 
 HitboxType Hitbox::get_type() {
 	return type;
+}
+
+SDL_Rect* Hitbox::get_rect()
+{
+	rect->x = this->x;
+	rect->y = this->y;
+	rect->w = this->w;
+	rect->h = this->h;
+	return rect;
 }

@@ -14,6 +14,7 @@
 #include "FPSCounter.h"
 #include "Overlay.h"
 #include "Camera.h"
+#include "MapGenerator.h"
 
 class Overlay;
 class FontRenderer;
@@ -39,6 +40,7 @@ public:
 	void render_mainmenu(); // shows the main menu image
 	void present_renderer(); // simple render without time delta for fps
 	void present_renderer(float delta);
+	void render_tiles(MapGenerator* map, float delta, Camera* camera); // render the tiles that can be seen on camera
 	void render_actors(std::vector<GameActor*>* actors, float delta, Camera* camera); //render with camera offset
 	int get_width();
 	int get_height();

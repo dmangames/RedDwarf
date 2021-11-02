@@ -1,6 +1,6 @@
 #include "Rock.h"
 
-#define DEBUG true
+#define DEBUG false
 
 #define WIDTH 32
 #define HEIGHT 32
@@ -12,7 +12,7 @@ Rock::Rock(float x, float y, int screen_w, int screen_h)
 	this->y = y;
 	this->screen_w = screen_w;
 	this->screen_h = screen_h;
-	this->hitbox = new Hitbox(0, 0, w, h);
+	this->hitbox = new Hitbox(0, 0, w, h, HitboxType::RECT);
 	this->health = 7;
 	load_animations();
 }
@@ -24,6 +24,11 @@ const GameActorType Rock::get_id()
 
 void Rock::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera)
 {
+	//Check if on screen
+	if (!camera->in_camera_view(hitbox->get_rect())) {
+		return;
+	}
+
 	SDL_Texture* texture;
 	texture = resources->get_texture("redrock", 1);
 	SDL_Rect dst;

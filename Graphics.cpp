@@ -87,6 +87,11 @@ void Graphics::present_renderer(float delta) {
 	fps_counter.count(delta);
 }
 
+void Graphics::render_tiles(MapGenerator* map, float delta, Camera* camera)
+{
+	map->render(renderer, resources, delta, camera);
+}
+
 void Graphics::render_actors(std::vector<GameActor*>* actors, float delta, Camera* camera) {
 	for (int i = 0; i < actors->size(); ++i) {
 		(*actors)[i]->render(renderer, resources, delta, camera);

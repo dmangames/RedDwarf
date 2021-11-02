@@ -33,3 +33,34 @@ void Camera::setPos(int x, int y) {
 	camera.x = x;
 	camera.y = y;
 }
+
+bool Camera::in_camera_view(SDL_Rect* test)
+{
+	SDL_Rect current_cam_rect;
+	current_cam_rect.x = get_x_offset();
+	current_cam_rect.y = get_y_offset();
+	current_cam_rect.w = width;
+	current_cam_rect.h = height;
+	if (SDL_HasIntersection(&current_cam_rect, test)) {
+		return true;
+	}
+	return false;
+}
+
+int Camera::get_x() {
+	return camera.x;
+}
+
+int Camera::get_y() {
+	return camera.y;
+}
+
+int Camera::get_width()
+{
+	return width;
+}
+
+int Camera::get_height()
+{
+	return height;
+}

@@ -17,6 +17,7 @@ class Hitbox {
 	float radius, circle_radius;
 	SDL_Point tl, tr, bl, br;
 	HitboxType type;
+	SDL_Rect* rect;
 
 public:
 	Hitbox(float x_offset, float y_offset, int w, int h, HitboxType type=HitboxType::RECT);
@@ -35,4 +36,5 @@ public:
 	float get_x();
 	float get_y();
 	HitboxType get_type();
+	SDL_Rect* get_rect();
 };

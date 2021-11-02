@@ -6,7 +6,8 @@
 #define WIDTH 32
 #define HEIGHT 32
 #define XOFFSET 16
-#define YOFFSET 16
+#define YOFFSET 10
+#define YADJUST 4
 
 //PRIVATE FUNCTIONS
 
@@ -47,7 +48,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     this->y = y;
     this->w = WIDTH;
 	this->h = HEIGHT;
-    hitbox = new Hitbox(XOFFSET/2, YOFFSET/2, w - XOFFSET, h - YOFFSET, HitboxType::CIRCLE);
+    hitbox = new Hitbox(XOFFSET/2, YOFFSET/2 + YADJUST, w - XOFFSET, h - YOFFSET, HitboxType::CIRCLE);
     fist = new Fist(0, 0, 10, 10, screen_w, screen_h);
     vx = vy = 0.0f;
     linear_accel = 500.0f;
@@ -311,8 +312,8 @@ void Player::calculate_slide(float ax, float ay) {
     float magnitude = sqrt(pow(distX, 2) + pow(distY, 2));
     float dirX = distX / magnitude;
     float dirY = distY / magnitude;
-    slideX += dirX;
-    slideY += dirY;
+    slideX += dirX * 10;
+    slideY += dirY * 10;
 }
 
 int Player::get_player_num() {

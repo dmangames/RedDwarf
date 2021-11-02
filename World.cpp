@@ -4,6 +4,9 @@
 #include "Rock.h"
 #include <vector>
 
+#define MAP_SIZE_WIDTH 10 //screen_w/32 + 10
+#define MAP_SIZE_HEIGHT 10 //screen_h/32 + 10
+
 // STATIC MEMBERS
 
 const float World::respawn_delay = 3.0f;
@@ -39,7 +42,7 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     this->screen_h = screen_h;
     collision_manager = new CollisionManager(&actors);
     camera = new Camera(screen_w, screen_h);
-    map_generator = new MapGenerator(screen_w/32 + 10, screen_h/32 + 10, 50);
+    map_generator = new MapGenerator(MAP_SIZE_WIDTH, MAP_SIZE_HEIGHT, 50);
     generate_map();
 
     //actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
@@ -76,7 +79,7 @@ void World::update(InputHandler* inputs) {
     }
 
     // Check for collisions
-    collision_manager->check_collisions();
+    //collision_manager->check_collisions();
 
     // Prune dead entities from entites vector
     for (int i = 0; i < actors.size(); i++) {
@@ -120,17 +123,24 @@ bool World::generate_map() {
     bool success = true;
 
     map_generator->generate_map();
-    std::vector<std::vector<int>>* map = map_generator->get_map();
 
-    for (int i = 0; i < map->size(); ++i) {
-        for (int j = 0; j < (*map)[0].size(); ++j) {
-            //create a rock
-            if((*map)[i][j] == 1)
-                actors.push_back(new Rock(i * 32.0f, j * 32.0f, screen_w, screen_h));
-        }
-    }
+    //OLD METHOD WHERE ALL ROCK TILES ARE ACTORS
+    //std::vector<std::vector<int>>* map = map_generator->get_map();
+    
+    //for (int i = 0; i < map->size(); ++i) {
+    //    for (int j = 0; j < (*map)[0].size(); ++j) {
+    //        //create a rock
+    //        if((*map)[i][j] == 1)
+    //            actors.push_back(new Rock(i * 32.0f, j * 32.0f, screen_w, screen_h));
+    //    }
+    //}
 
     return success;
+}
+
+MapGenerator* World::get_map()
+{
+    return map_generator;
 }
 
 World::~World() {
