@@ -19,6 +19,7 @@ public:
 	const bool collides();
 	bool does_collide(GameActorType id);
 	void collide_actor(GameActor* actor);
+	void collide_tile(Tile* tile);
 	virtual void take_damage(int damage)=0;
 	int get_damage_taken();
 	int get_health();

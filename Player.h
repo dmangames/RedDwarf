@@ -67,6 +67,7 @@ public:
 	const bool collides();
 	bool does_collide(GameActorType id);
 	void collide_actor(GameActor* actor);
+	void collide_tile(Tile* tile);
 	int get_player_num();
 	void load_animations();
 	void take_damage(int damage);

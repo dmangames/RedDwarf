@@ -72,6 +72,10 @@ void Resources::load_resources() {
 	load_texture(&textures["main_menu"][1], "red_dwarf_main_menu_art.png");
 	load_texture(&textures["dwarf"][1], "dwarf.png");
 	load_texture(&textures["redrock"][1], "redrock_ss.png");
+	load_texture(&textures["purplerock"][1], "purplerock_ss.png");
+
+	// ANIMATION FRAMES
+	load_animations();
 }
 
 TTF_Font* Resources::get_font(std::string name) {
@@ -98,4 +102,55 @@ Resources::~Resources() {
 			frame_it->second = NULL;
 		}
 	}
+}
+
+SDL_Rect* Resources::get_anim_rect_32(int frame)
+{
+	return &anim_rects_32[frame];
+}
+
+void Resources::load_animations() {
+	//Set sprite clips
+	// Destruction
+	anim_rects_32[0].x = 0;
+	anim_rects_32[0].y = 0;
+	anim_rects_32[0].w = 32;
+	anim_rects_32[0].h = 32;
+
+	anim_rects_32[1].x = 32;
+	anim_rects_32[1].y = 0;
+	anim_rects_32[1].w = 32;
+	anim_rects_32[1].h = 32;
+
+	anim_rects_32[2].x = 64;
+	anim_rects_32[2].y = 0;
+	anim_rects_32[2].w = 32;
+	anim_rects_32[2].h = 32;
+
+	anim_rects_32[3].x = 96;
+	anim_rects_32[3].y = 0;
+	anim_rects_32[3].w = 32;
+	anim_rects_32[3].h = 32;
+
+	anim_rects_32[4].x = 128;
+	anim_rects_32[4].y = 0;
+	anim_rects_32[4].w = 32;
+	anim_rects_32[4].h = 32;
+
+	anim_rects_32[5].x = 160;
+	anim_rects_32[5].y = 0;
+	anim_rects_32[5].w = 32;
+	anim_rects_32[5].h = 32;
+
+	anim_rects_32[6].x = 192;
+	anim_rects_32[6].y = 0;
+	anim_rects_32[6].w = 32;
+	anim_rects_32[6].h = 32;
+
+	anim_rects_32[7].x = 224;
+	anim_rects_32[7].y = 0;
+	anim_rects_32[7].w = 32;
+	anim_rects_32[7].h = 32;
+
+
 }

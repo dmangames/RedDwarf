@@ -7,6 +7,7 @@
 #include "Resources.h"
 #include "Hitbox.h"
 #include "Camera.h"
+#include "MapGenerator.h"
 
 enum class GameActorType {
 	PLAYER,
@@ -59,6 +60,7 @@ public:
 	virtual const bool collides() = 0;
 	virtual bool does_collide(GameActorType type) = 0;
 	virtual void collide_actor(GameActor* actor) = 0;
+	virtual void collide_tile(Tile* tile) = 0;
 	virtual void take_damage(int damage) = 0;
 
 

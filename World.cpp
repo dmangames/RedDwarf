@@ -79,7 +79,10 @@ void World::update(InputHandler* inputs) {
     }
 
     // Check for collisions
-    //collision_manager->check_collisions();
+    collision_manager->check_collisions();
+
+    // Check for tile map collisions
+    collision_manager->check_tile_collisions(map_generator);
 
     // Prune dead entities from entites vector
     for (int i = 0; i < actors.size(); i++) {

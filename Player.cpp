@@ -82,7 +82,7 @@ void Player::update(float delta) {
 
 
     if (isColliding) {
-        printf("COLLIDING\n");
+        //printf("COLLIDING\n");
         // Apply change in x and y directions plus slide to the old position
         x = px + delta * (vx + slideX);
         y = py + delta * (vy + slideY);
@@ -303,6 +303,17 @@ void Player::collide_actor(GameActor* actor) {
         break;
     }
 
+}
+
+void Player::collide_tile(Tile* tile)
+{
+    x = px;
+    y = py;
+    isColliding = true;
+    //TODO: why do i add 16 to y as well? I thought sdl originated top left?
+    calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
+
+    camera->setPos((int)x, (int)y);
 }
 
 void Player::calculate_slide(float ax, float ay) {

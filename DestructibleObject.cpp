@@ -37,6 +37,11 @@ void DestructibleObject::collide_actor(GameActor* actor)
 {
 }
 
+void DestructibleObject::collide_tile(Tile* tile)
+{
+}
+
+
 bool DestructibleObject::is_alive() {
 	return alive;
 }

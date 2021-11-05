@@ -154,6 +154,58 @@ bool check_hitboxes(Hitbox* h1, Hitbox* h2) {
 
 }
 
+
+//Rect hitbox and tile
+bool intersect_rect_tile(int tile_left, int tile_right, int tile_bottom, int tile_top, Hitbox* h1) {
+	return !(tile_left > h1->get_tr().x
+		|| tile_right < h1->get_tl().x
+		|| tile_top > h1->get_bl().y
+		|| tile_bottom < h1->get_tl().y);
+}
+
+// CIRCLE / Tile
+bool intersect_circle_tile(Hitbox* circle, int tile_x, int tile_y, int tile_w, int tile_h) {
+	float cx = circle->get_center_x();
+	float cy = circle->get_center_y();
+	float radius = circle->get_circle_radius();
+	float rx = tile_x;
+	float ry = tile_y;
+	float rw = tile_w;
+	float rh = tile_h;
+
+	// temporary variables to set edges for testing
+	float testX = cx;
+	float testY = cy;
+
+	// which edge is closest?
+	if (cx < rx)         testX = rx;      // test left edge
+	else if (cx > rx + rw) testX = rx + rw;   // right edge
+	if (cy < ry)         testY = ry;      // top edge
+	else if (cy > ry + rh) testY = ry + rh;   // bottom edge
+
+	// get distance from closest edges
+	float distX = cx - testX;
+	float distY = cy - testY;
+	float distance = (distX * distX) + (distY * distY);
+
+	// if the distance is less than the radius, collision!
+	if (distance <= radius) {
+		return true;
+	}
+	return false;
+}
+
+bool check_actor_tile_intersect(Hitbox* h1, int tile_x, int tile_y, int tile_w, int tile_h) {
+	switch (h1->get_type()) {
+	case HitboxType::RECT:
+		return intersect_rect_tile(tile_x, tile_x + tile_w, tile_y + tile_h, tile_y, h1);
+	case HitboxType::CIRCLE:
+		return intersect_circle_tile(h1, tile_x, tile_y, tile_w, tile_h);
+	}
+	return false;
+}
+
+
 // Check for collisions and notify entities
 void CollisionManager::check_collisions() {
 
@@ -178,4 +230,36 @@ void CollisionManager::check_collisions() {
 		}
 	}
 
+}
+
+void CollisionManager::check_tile_collisions(MapGenerator* map)
+{
+	//we need all the actor positions converted to grid locations
+	for (int i = 0; i < actors->size(); i++) {
+		if ((*actors)[i]->collides() && (*actors)[i]->is_active()) {
+			// Convert to grid locations
+			int gridx = ((*actors)[i]->get_x()+16)/32;
+			int gridy = ((*actors)[i]->get_y()+16)/32;
+
+			//printf("X: %d Y: %d\n", gridx, gridy);
+			// Check grid position as well as neighbors for potential collisions
+
+			for (auto t : *(map->get_neighboring_cells(gridx, gridy, 2))) {
+				switch (t->type) {
+				case TileType::EMPTY:
+					continue;
+				case TileType::DIRT:
+					if(check_actor_tile_intersect((*actors)[i]->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
+						(*actors)[i]->collide_tile(t);
+					}
+					break;
+				case TileType::METAL:
+					if (check_actor_tile_intersect((*actors)[i]->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
+						(*actors)[i]->collide_tile(t);
+					}
+					break;
+				}
+			}
+		}
+	}
 }
