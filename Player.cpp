@@ -52,7 +52,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     fist = new Fist(0, 0, 10, 10, screen_w, screen_h);
     vx = vy = 0.0f;
     linear_accel = 500.0f;
-    friction_coeff = 0.8f;
+    friction_coeff = 0.2f;
     max_speed = 300.0f;
     angle = 0;
     alive = true;
@@ -215,34 +215,70 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, C
 
 void Player::handle_inputs(float delta, InputHandler* inputs) {
     if (player_num == 1) {
-        bool activate_friction = true;
+        bool activate_friction_x = true;
+        bool activate_friction_y = true;
+
         // Movement Controls
         if (inputs->is_key_down(KEY_P1_MOVE_UP)) {
-            vy -= delta * linear_accel;
-            activate_friction = false;
+            if (vy > 0) {
+                vy = 0;
+            }
+            if (inputs->is_key_down(KEY_P1_MOVE_LEFT) || inputs->is_key_down(KEY_P1_MOVE_RIGHT)) {
+                vy -= delta * linear_accel * .707;
+            }
+            else {
+                vy -= delta * linear_accel;
+            }
+            activate_friction_y = false;
         }
         if (inputs->is_key_down(KEY_P1_MOVE_DOWN)) {
-            vy += delta * linear_accel;
-            activate_friction = false;
+            if (vy < 0) {
+                vy = 0;
+            }
+            if (inputs->is_key_down(KEY_P1_MOVE_LEFT) || inputs->is_key_down(KEY_P1_MOVE_RIGHT)) {
+                vy += delta * linear_accel * .707;
+            }
+            else {
+                vy += delta * linear_accel;
+            }
+            activate_friction_y = false;
         }
         if (inputs->is_key_down(KEY_P1_MOVE_RIGHT)) {
-            vx += delta * linear_accel;
-            activate_friction = false;
+            if (vx < 0) {
+                vx = 0;
+            }
+            if (inputs->is_key_down(KEY_P1_MOVE_UP) || inputs->is_key_down(KEY_P1_MOVE_DOWN)) {
+                vx += delta * linear_accel * .707;
+            }
+            else {
+                vx += delta * linear_accel;
+            }
+            activate_friction_x = false;
             if (vx > 0.1) {
                 // Face Right
                 flip = SDL_FLIP_HORIZONTAL;
             }
         }
         if (inputs->is_key_down(KEY_P1_MOVE_LEFT)) {
-            vx -= delta * linear_accel;
-            activate_friction = false;
+            if (vx > 0) {
+                vx = 0;
+            }
+            if (inputs->is_key_down(KEY_P1_MOVE_UP) || inputs->is_key_down(KEY_P1_MOVE_DOWN)) {
+                vx -= delta * linear_accel * .707;
+            }
+            else {
+                vx -= delta * linear_accel;
+            }
+            activate_friction_x = false;
             if (vx < -0.1) {
                 // Face Left
                 flip = SDL_FLIP_NONE;
             }
         }
-        if (activate_friction || isColliding) {
+        if (activate_friction_x || isColliding) {
             vx *= friction_coeff;
+        }
+        if (activate_friction_y || isColliding) {
             vy *= friction_coeff;
         }
 
@@ -307,6 +343,7 @@ void Player::collide_actor(GameActor* actor) {
 
 void Player::collide_tile(Tile* tile)
 {
+    //Set back to position that doesn't collide with tile
     x = px;
     y = py;
     isColliding = true;
