@@ -77,35 +77,78 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 
 void Player::update(float delta) {
 
+    printf("Colliding: %c\n", isColliding);
+
     //printf("X Velocity: %4.2f\n", vx);
-
-
-
     if (isColliding) {
-        //printf("COLLIDING\n");
-        // Apply change in x and y directions plus slide to the old position
-        x = px + delta * (vx + slideX);
-        y = py + delta * (vy + slideY);
-        //isColliding = false;
+        switch (isColliding) {
+        case 'r':
+            y = py + delta * (vy + slideY);
+            if (vx < 0)
+                x = px + delta * (vx + slideX);
+            else
+                x = px;
+            break;
+        case 'l':
+            y = py + delta * (vy + slideY);
+            if (vx > 0)
+                x = px + delta * (vx + slideX);
+            else
+                x = px;
+            break;
+        case 't':
+            x = px + delta * (vx + slideX);
+            if(vy > 0)
+                y = py + delta * (vy + slideY);
+            else
+                y = py;
+            break;
+        case 'b':
+            x = px + delta * (vx + slideX);
+            if (vy < 0)
+                y = py + delta * (vy + slideY);
+            else
+                y = py;
+            break;
+        default:
+            break;
+        }
+        isColliding = false;
     }
     else {
-        px = x;
-        py = y;
-        // Apply change in x and y directions
         x += delta * vx;
         y += delta * vy;
     }
 
+    px = x;
+    py = y;
+
+    //if (isColliding) {
+    //    //printf("COLLIDING\n");
+    //    // Apply change in x and y directions plus slide to the old position
+    //    x = px + delta * (vx + slideX);
+    //    y = py + delta * (vy + slideY);
+
+    //    //isColliding = false;
+    //}
+    //else {
+    //    px = x;
+    //    py = y;
+    //    // Apply change in x and y directions
+    //    x += delta * vx;
+    //    y += delta * vy;
+    //}
+
     //x += delta * slideX;
     //y += delta * slideY;
 
-    if (!isColliding) {
-        slideX = 0;
-        slideY = 0;
-    }
-    else {
-        isColliding = false;
-    }
+    //if (!isColliding) {
+    //    slideX = 0;
+    //    slideY = 0;
+    //}
+    //else {
+    //    isColliding = false;
+    //}
 
 
 
@@ -218,6 +261,11 @@ void Player::handle_inputs(float delta, InputHandler* inputs) {
         bool activate_friction_x = true;
         bool activate_friction_y = true;
 
+        bool is_up_key_pressed = inputs->is_key_down(KEY_P1_MOVE_UP);
+        bool is_down_key_pressed = inputs->is_key_down(KEY_P1_MOVE_DOWN);
+        bool is_left_key_pressed = inputs->is_key_down(KEY_P1_MOVE_LEFT);
+        bool is_right_key_pressed = inputs->is_key_down(KEY_P1_MOVE_RIGHT);
+
         // Movement Controls
         if (inputs->is_key_down(KEY_P1_MOVE_UP)) {
             if (vy > 0) {
@@ -275,10 +323,17 @@ void Player::handle_inputs(float delta, InputHandler* inputs) {
                 flip = SDL_FLIP_NONE;
             }
         }
-        if (activate_friction_x || isColliding) {
+        //if (activate_friction_x || isColliding) {
+        //    vx *= friction_coeff;
+        //}
+        //if (activate_friction_y || isColliding) {
+        //    vy *= friction_coeff;
+        //}
+
+        if (activate_friction_x ) {
             vx *= friction_coeff;
         }
-        if (activate_friction_y || isColliding) {
+        if (activate_friction_y ) {
             vy *= friction_coeff;
         }
 
@@ -341,14 +396,62 @@ void Player::collide_actor(GameActor* actor) {
 
 }
 
+
 void Player::collide_tile(Tile* tile)
 {
+    SDL_Rect r;
+    r.x = tile->x * 32;
+    r.y = tile->y * 32;
+    r.w = 32;
+    r.h = 32;
+
+    SDL_Point tp, bp, lp, rp;
+    tp.x = x + WIDTH / 2;
+    tp.y = y;
+    bp.x = x + WIDTH / 2;
+    bp.y = y + HEIGHT;
+    lp.x = x;
+    lp.y = y + HEIGHT / 2;
+    rp.x = x + WIDTH;
+    rp.y = y + HEIGHT / 2;
+
+    //check to see if i'm colliding at the top, bottom, left, or right
+    if (SDL_PointInRect(&rp, &r)) {
+        //the right side is colliding
+        if (vx > 0) {
+            vx = 0;
+        }
+        isColliding = 'r';
+    }
+    else if (SDL_PointInRect(&lp, &r)) {
+        // the left side is colliding
+        if (vx < 0) {
+            vx = 0;
+        }
+        isColliding = 'l';
+    }
+    else if (SDL_PointInRect(&bp, &r)) {
+        // the bottom side is colliding
+        if (vy > 0) {
+            vy = 0;
+        }
+        isColliding = 'b';
+    }
+    else if (SDL_PointInRect(&tp, &r)) {
+        // the top side is colliding
+        if (vy < 0) {
+            vy = 0;
+        }
+        isColliding = 't';
+    }
+
+
     //Set back to position that doesn't collide with tile
-    x = px;
-    y = py;
-    isColliding = true;
+    /*x = px;
+    y = py;*/
     //TODO: why do i add 16 to y as well? I thought sdl originated top left?
-    calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
+    //The positive y axis points down, do the origin is found by adding half the width and half the height to x and y
+    //calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
 
     camera->setPos((int)x, (int)y);
 }
@@ -362,6 +465,7 @@ void Player::calculate_slide(float ax, float ay) {
     float dirY = distY / magnitude;
     slideX += dirX * 10;
     slideY += dirY * 10;
+
 }
 
 int Player::get_player_num() {

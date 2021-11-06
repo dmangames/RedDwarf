@@ -4,8 +4,8 @@
 #include "Rock.h"
 #include <vector>
 
-#define MAP_SIZE_WIDTH 10 //screen_w/32 + 10
-#define MAP_SIZE_HEIGHT 10 //screen_h/32 + 10
+#define MAP_SIZE_WIDTH 1000 //screen_w/32 + 10
+#define MAP_SIZE_HEIGHT 1000 //screen_h/32 + 10
 
 // STATIC MEMBERS
 

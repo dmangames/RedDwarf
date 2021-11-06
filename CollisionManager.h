@@ -17,6 +17,6 @@ public:
 	CollisionManager(std::vector<GameActor*>* actors);
 	void check_collisions();
 	void check_tile_collisions(MapGenerator* Map);
-
+	Tile* check_actor_tile_collisions(GameActor* actor, MapGenerator* map);
 
 };

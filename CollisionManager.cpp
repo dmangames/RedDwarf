@@ -155,7 +155,8 @@ bool check_hitboxes(Hitbox* h1, Hitbox* h2) {
 }
 
 
-//Rect hitbox and tile
+
+// RECT hitbox and Tile
 bool intersect_rect_tile(int tile_left, int tile_right, int tile_bottom, int tile_top, Hitbox* h1) {
 	return !(tile_left > h1->get_tr().x
 		|| tile_right < h1->get_tl().x
@@ -163,7 +164,7 @@ bool intersect_rect_tile(int tile_left, int tile_right, int tile_bottom, int til
 		|| tile_bottom < h1->get_tl().y);
 }
 
-// CIRCLE / Tile
+// CIRCLE hitbox and Tile
 bool intersect_circle_tile(Hitbox* circle, int tile_x, int tile_y, int tile_w, int tile_h) {
 	float cx = circle->get_center_x();
 	float cy = circle->get_center_y();
@@ -259,6 +260,36 @@ void CollisionManager::check_tile_collisions(MapGenerator* map)
 					}
 					break;
 				}
+			}
+		}
+	}
+}
+
+Tile* CollisionManager::check_actor_tile_collisions(GameActor* actor, MapGenerator* map)
+{
+
+	if (actor->collides() && actor->is_active()) {
+		// Convert to grid locations
+		int gridx = (actor->get_x() + 16) / 32;
+		int gridy = (actor->get_y() + 16) / 32;
+
+		//printf("X: %d Y: %d\n", gridx, gridy);
+		// Check grid position as well as neighbors for potential collisions
+
+		for (auto t : *(map->get_neighboring_cells(gridx, gridy, 2))) {
+			switch (t->type) {
+			case TileType::EMPTY:
+				continue;
+			case TileType::DIRT:
+				if (check_actor_tile_intersect(actor->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
+					return t;
+				}
+				break;
+			case TileType::METAL:
+				if (check_actor_tile_intersect(actor->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
+					return t;
+				}
+				break;
 			}
 		}
 	}
