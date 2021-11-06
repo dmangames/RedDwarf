@@ -25,7 +25,8 @@ class Player : public GameActor {
 	float angle;
 	bool alive;
 	int player_num;
-	char isColliding;
+	bool isColliding;
+	unsigned char collision_flags;
 	float px, py;
 	Fist* fist;
 

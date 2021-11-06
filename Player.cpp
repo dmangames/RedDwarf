@@ -9,6 +9,11 @@
 #define YOFFSET 10
 #define YADJUST 4
 
+#define RIGHT 1
+#define LEFT 2
+#define TOP 4
+#define BOTTOM 8
+
 //PRIVATE FUNCTIONS
 
 void Player::setAnimState(AnimState s) {
@@ -77,47 +82,62 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 
 void Player::update(float delta) {
 
-    printf("Colliding: %c\n", isColliding);
+
 
     //printf("X Velocity: %4.2f\n", vx);
     if (isColliding) {
-        switch (isColliding) {
-        case 'r':
-            y = py + delta * (vy + slideY);
-            if (vx < 0)
-                x = px + delta * (vx + slideX);
+
+        //Temp variables
+        float tvx = vx;
+        float tvy = vy;
+
+        if ((collision_flags & RIGHT) == RIGHT) {
+            if (vx < 0) // going left (good)
+                tvx = vx;
             else
-                x = px;
-            break;
-        case 'l':
-            y = py + delta * (vy + slideY);
-            if (vx > 0)
-                x = px + delta * (vx + slideX);
-            else
-                x = px;
-            break;
-        case 't':
-            x = px + delta * (vx + slideX);
-            if(vy > 0)
-                y = py + delta * (vy + slideY);
-            else
-                y = py;
-            break;
-        case 'b':
-            x = px + delta * (vx + slideX);
-            if (vy < 0)
-                y = py + delta * (vy + slideY);
-            else
-                y = py;
-            break;
-        default:
-            break;
+                tvx = 0;
+            printf("Colliding: RIGHT ");
         }
+        if ((collision_flags & LEFT) == LEFT) {
+            if (vx > 0) // goin right (good)
+                tvx = vx;
+            else
+                tvx = 0;
+            printf("Colliding: LEFT ");
+        }
+        if ((collision_flags & TOP) == TOP) {
+            if (vy > 0) // goin down (good)
+                tvy = vy;
+            else
+                tvy = 0;
+            printf("Colliding: TOP ");
+        }
+        if ((collision_flags & BOTTOM) == BOTTOM) {
+            if (vy < 0) // goin up (good)
+                tvy = vy;
+            else
+                tvy = 0;
+            printf("Colliding: BOTTOM ");
+        }
+        if (collision_flags == 0) {
+            //this means that a corner is hitting so we should use the slide technique
+            x = px + delta * (vx + slideX);
+            y = py + delta * (vy + slideY);
+        }
+        else {
+            //apply the adjusted velocity
+            x = px + delta * tvx;
+            y = py + delta * tvy;
+        }
+        printf("\n");
         isColliding = false;
+        collision_flags = 0;
     }
     else {
         x += delta * vx;
         y += delta * vy;
+        slideX = 0;
+        slideY = 0;
     }
 
     px = x;
@@ -421,37 +441,39 @@ void Player::collide_tile(Tile* tile)
         if (vx > 0) {
             vx = 0;
         }
-        isColliding = 'r';
+        collision_flags = collision_flags | RIGHT;
     }
     else if (SDL_PointInRect(&lp, &r)) {
         // the left side is colliding
         if (vx < 0) {
             vx = 0;
         }
-        isColliding = 'l';
+        collision_flags = collision_flags | LEFT;
     }
     else if (SDL_PointInRect(&bp, &r)) {
         // the bottom side is colliding
         if (vy > 0) {
             vy = 0;
         }
-        isColliding = 'b';
+        collision_flags = collision_flags | BOTTOM;
     }
     else if (SDL_PointInRect(&tp, &r)) {
         // the top side is colliding
         if (vy < 0) {
             vy = 0;
         }
-        isColliding = 't';
+        collision_flags = collision_flags | TOP;
     }
 
+    isColliding = true;
 
     //Set back to position that doesn't collide with tile
     /*x = px;
     y = py;*/
     //TODO: why do i add 16 to y as well? I thought sdl originated top left?
     //The positive y axis points down, do the origin is found by adding half the width and half the height to x and y
-    //calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
+    if(collision_flags == 0)
+        calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
 
     camera->setPos((int)x, (int)y);
 }
