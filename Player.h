@@ -23,6 +23,7 @@ class Player : public GameActor {
 	float linear_accel, friction_coeff;
 	float max_speed;
 	float angle;
+	float delta;
 	bool alive;
 	int player_num;
 	bool isColliding;
@@ -30,7 +31,7 @@ class Player : public GameActor {
 	float px, py;
 	Fist* fist;
 
-	float slideX, slideY;
+	float slideX, slideY, superSlideX, superSlideY;
 	
 
 	

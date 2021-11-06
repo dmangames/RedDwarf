@@ -8,9 +8,12 @@ private:
 	int height = 720;
 	int x_offset = 0;
 	int y_offset = 0;
+	int destX, destY = 0;
 public:
 	Camera();
 	Camera(int width, int height);
+	void update();
+	void setDestination(int x, int y);
 	int get_x_offset(); //this is actually pos + offset
 	int get_y_offset(); //this is actually pos + offset
 	void setPos(int x, int y);

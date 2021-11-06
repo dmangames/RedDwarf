@@ -1,6 +1,6 @@
 #include "Player.h"
 
-#define DEBUG true
+#define DEBUG false
 
 
 #define WIDTH 32
@@ -13,6 +13,10 @@
 #define LEFT 2
 #define TOP 4
 #define BOTTOM 8
+#define TOPLEFT 16
+#define TOPRIGHT 32
+#define BOTTOMLEFT 64
+#define BOTTOMRIGHT 128
 
 //PRIVATE FUNCTIONS
 
@@ -82,66 +86,28 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 
 void Player::update(float delta) {
 
+    // Store where I came from (old position before update)
+    px = x;
+    py = y;
 
-
-    //printf("X Velocity: %4.2f\n", vx);
+    this->delta = delta;
+   
     if (isColliding) {
-
-        //Temp variables
-        float tvx = vx;
-        float tvy = vy;
-
-        if ((collision_flags & RIGHT) == RIGHT) {
-            if (vx < 0) // going left (good)
-                tvx = vx;
-            else
-                tvx = 0;
-            printf("Colliding: RIGHT ");
-        }
-        if ((collision_flags & LEFT) == LEFT) {
-            if (vx > 0) // goin right (good)
-                tvx = vx;
-            else
-                tvx = 0;
-            printf("Colliding: LEFT ");
-        }
-        if ((collision_flags & TOP) == TOP) {
-            if (vy > 0) // goin down (good)
-                tvy = vy;
-            else
-                tvy = 0;
-            printf("Colliding: TOP ");
-        }
-        if ((collision_flags & BOTTOM) == BOTTOM) {
-            if (vy < 0) // goin up (good)
-                tvy = vy;
-            else
-                tvy = 0;
-            printf("Colliding: BOTTOM ");
-        }
-        if (collision_flags == 0) {
-            //this means that a corner is hitting so we should use the slide technique
-            x = px + delta * (vx + slideX);
-            y = py + delta * (vy + slideY);
-        }
-        else {
-            //apply the adjusted velocity
-            x = px + delta * tvx;
-            y = py + delta * tvy;
-        }
-        printf("\n");
         isColliding = false;
+        if (collision_flags < 15) { // if not a corner, turn slide off
+            slideX = 0;
+            slideY = 0;
+        }
         collision_flags = 0;
     }
-    else {
+    else{
         x += delta * vx;
         y += delta * vy;
         slideX = 0;
         slideY = 0;
     }
 
-    px = x;
-    py = y;
+    
 
     //if (isColliding) {
     //    //printf("COLLIDING\n");
@@ -246,7 +212,7 @@ void Player::update(float delta) {
 
 
     // Update camera
-    camera->setPos((int)x, (int)y);
+    camera->setDestination((int)x, (int)y);
     
 }
 
@@ -417,14 +383,19 @@ void Player::collide_actor(GameActor* actor) {
 }
 
 
+
+
 void Player::collide_tile(Tile* tile)
 {
+    isColliding = true;
+
     SDL_Rect r;
     r.x = tile->x * 32;
     r.y = tile->y * 32;
     r.w = 32;
     r.h = 32;
 
+    // Side points
     SDL_Point tp, bp, lp, rp;
     tp.x = x + WIDTH / 2;
     tp.y = y;
@@ -435,6 +406,17 @@ void Player::collide_tile(Tile* tile)
     rp.x = x + WIDTH;
     rp.y = y + HEIGHT / 2;
 
+    // Corner points
+    SDL_Point tlp, blp, trp, brp;
+    tlp.x = x;
+    tlp.y = y;
+    blp.x = x;
+    blp.y = y + HEIGHT;
+    trp.x = x + WIDTH;
+    trp.y = y;
+    brp.x = x + WIDTH;
+    brp.y = y + HEIGHT;
+
     //check to see if i'm colliding at the top, bottom, left, or right
     if (SDL_PointInRect(&rp, &r)) {
         //the right side is colliding
@@ -443,21 +425,21 @@ void Player::collide_tile(Tile* tile)
         }
         collision_flags = collision_flags | RIGHT;
     }
-    else if (SDL_PointInRect(&lp, &r)) {
+    if (SDL_PointInRect(&lp, &r)) {
         // the left side is colliding
         if (vx < 0) {
             vx = 0;
         }
         collision_flags = collision_flags | LEFT;
     }
-    else if (SDL_PointInRect(&bp, &r)) {
+    if (SDL_PointInRect(&bp, &r)) {
         // the bottom side is colliding
         if (vy > 0) {
             vy = 0;
         }
         collision_flags = collision_flags | BOTTOM;
     }
-    else if (SDL_PointInRect(&tp, &r)) {
+    if (SDL_PointInRect(&tp, &r)) {
         // the top side is colliding
         if (vy < 0) {
             vy = 0;
@@ -465,28 +447,166 @@ void Player::collide_tile(Tile* tile)
         collision_flags = collision_flags | TOP;
     }
 
-    isColliding = true;
+        //check to see if i'm colliding at the corners
+        if (SDL_PointInRect(&tlp, &r)) {
+            //the top left corner is colliding
+
+            collision_flags = collision_flags | TOPLEFT;
+        }
+        if (SDL_PointInRect(&trp, &r)) {
+            // the top right corner is colliding
+
+            collision_flags = collision_flags | TOPRIGHT;
+        }
+        if (SDL_PointInRect(&blp, &r)) {
+            // the bottom left corner is colliding
+
+            collision_flags = collision_flags | BOTTOMLEFT;
+        }
+        if (SDL_PointInRect(&brp, &r)) {
+            // the bottom right is colliding
+
+            collision_flags = collision_flags | BOTTOMRIGHT;
+        }
+    
+    
+
+
 
     //Set back to position that doesn't collide with tile
     /*x = px;
     y = py;*/
     //TODO: why do i add 16 to y as well? I thought sdl originated top left?
     //The positive y axis points down, do the origin is found by adding half the width and half the height to x and y
-    if(collision_flags == 0)
+
+    //if(collision_flags > 0 && ((collision_flags & 0x0f) == 0)) // we are dealing with only corners
         calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
 
-    camera->setPos((int)x, (int)y);
+
+
+    //Temp variables
+    float tvx = vx;
+    float tvy = vy;
+
+    //If I only have side and corner collisions on the same side, I go with the corner collision
+
+    // See if I have any side collisions
+    if ((collision_flags & 0x0f) != 0)
+    {
+        if ((collision_flags & RIGHT) == RIGHT) {
+
+                tvx = std::min(vx, 0.0f);
+                printf("Colliding: RIGHT ");
+            
+        }
+        if ((collision_flags & LEFT) == LEFT) {
+
+                tvx = std::max(vx, 0.0f);
+                printf("Colliding: LEFT ");
+            
+        }
+        if ((collision_flags & TOP) == TOP) {
+
+                tvy = std::max(vy, 0.0f);
+                printf("Colliding: TOP ");
+            
+        }
+        if ((collision_flags & BOTTOM) == BOTTOM) {
+
+                tvy = std::min(vy, 0.0f);
+                printf("Colliding: BOTTOM ");
+            
+        }
+
+    }
+    else {
+        // this means there's no side collisions so just apply the corner slides
+        if ((collision_flags & 0xf0) != 0) {
+            if ((collision_flags & TOPLEFT) == TOPLEFT) {
+                if (std::abs(vx) > std::abs(vy)) {
+                    //tvx = (vx + slideX) / 2;
+                    tvy = slideY;
+                }
+                else {
+                    tvx = slideX;
+                    //tvy = (vy + slideY) / 2;
+                }
+                printf("Colliding: TOPLEFT ");
+            }
+            if ((collision_flags & TOPRIGHT) == TOPRIGHT) {
+                if (std::abs(vx) > std::abs(vy)) {
+                    //tvx = (vx + slideX) / 2;
+                    tvy = slideY;
+                }
+                else {
+                    tvx = slideX;
+                    //tvy = (vy + slideY) / 2;
+                }
+                printf("Colliding: TOPRIGHT ");
+            }
+            if ((collision_flags & BOTTOMLEFT) == BOTTOMLEFT) {
+                if (std::abs(vx) > std::abs(vy)) {
+                    //tvx = (vx + slideX) / 2;
+                    tvy = slideY;
+                }
+                else {
+                    tvx = slideX;
+                    //tvy = (vy + slideY) / 2;
+                }
+                printf("Colliding: BOTTOMLEFT ");
+            }
+            if ((collision_flags & BOTTOMRIGHT) == BOTTOMRIGHT) {
+                if (std::abs(vx) > std::abs(vy)) {
+                    //tvx = (vx + slideX) / 2;
+                    tvy = slideY;
+                }
+                else {
+                    tvx = slideX;
+                    //tvy = (vy + slideY) / 2;
+                }
+                printf("Colliding: BOTTOMRIGHT ");
+            }
+        }
+    }
+    
+    //apply the adjusted velocity
+    x = px + delta * (tvx + superSlideX);
+    y = py + delta * (tvy + superSlideY);
+
+
+    printf("\n");
+
+    if (collision_flags == 0)
+        isColliding = false;
+    
+
+    camera->setDestination((int)x, (int)y);
 }
 
 void Player::calculate_slide(float ax, float ay) {
 
+    //float distX = get_center_x() - ax;
+    //float distY = get_center_y() - ay;
+    //float magnitude = sqrt(pow(distX, 2) + pow(distY, 2));
+    //float dirX = distX / magnitude;
+    //float dirY = distY / magnitude;
+    //slideX += dirX * 10;
+    //slideY += dirY * 10;
+
     float distX = get_center_x() - ax;
     float distY = get_center_y() - ay;
-    float magnitude = sqrt(pow(distX, 2) + pow(distY, 2));
-    float dirX = distX / magnitude;
-    float dirY = distY / magnitude;
-    slideX += dirX * 10;
-    slideY += dirY * 10;
+    //float magnitude = pow(distX, 2) + pow(distY, 2);
+    //float dirX = distX / magnitude;
+    //float dirY = distY / magnitude;
+
+    if (distX < 30) {
+        superSlideX = distX;
+    }
+    if (distY < 30) {
+        superSlideY = distY;
+    }
+    slideX += distX/2;
+    slideY += distY/2;
 
 }
 

@@ -84,6 +84,8 @@ void World::update(InputHandler* inputs) {
     // Check for tile map collisions
     collision_manager->check_tile_collisions(map_generator);
 
+    camera->update();
+
     // Prune dead entities from entites vector
     for (int i = 0; i < actors.size(); i++) {
         if (!actors[i]->is_alive()) {
