@@ -23,7 +23,7 @@
 void Player::setAnimState(AnimState s) {
     switch (s) {
     case AnimState::IDLE:
-         if (state != AnimState::IDLE) {
+        if (state != AnimState::IDLE) {
             state = AnimState::IDLE;
             startFrame = IDLE_ANIMATION_START;
             updatesPerFrame = IDLE_UPDATE_RATE;
@@ -52,12 +52,12 @@ void Player::setAnimState(AnimState s) {
 // PUBLIC FUNCTIONS
 
 Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std::vector<GameActor*>* actors, Camera* camera)
-        : GameActor(x, y, WIDTH, HEIGHT, screen_w, screen_h){
+    : GameActor(x, y, WIDTH, HEIGHT, screen_w, screen_h) {
     this->x = x;
     this->y = y;
     this->w = WIDTH;
-	this->h = HEIGHT;
-    hitbox = new Hitbox(XOFFSET/2, YOFFSET/2 + YADJUST, w - XOFFSET, h - YOFFSET, HitboxType::CIRCLE);
+    this->h = HEIGHT;
+    hitbox = new Hitbox(XOFFSET / 2, YOFFSET / 2 + YADJUST, w - XOFFSET, h - YOFFSET, HitboxType::CIRCLE);
     fist = new Fist(0, 0, 10, 10, screen_w, screen_h);
     vx = vy = 0.0f;
     linear_accel = 500.0f;
@@ -91,23 +91,32 @@ void Player::update(float delta) {
     py = y;
 
     this->delta = delta;
-   
+
     if (isColliding) {
-        isColliding = false;
         if (collision_flags < 15) { // if not a corner, turn slide off
             slideX = 0;
             slideY = 0;
         }
+        if (inner_collision_flags == 0) { // if no inner collision is triggered, turn superslide off
+            superSlideX = 0;
+            superSlideY = 0;
+        }
+
+        //Reset all collision bools and flags
+        isColliding = false;
         collision_flags = 0;
+        inner_collision_flags = 0;
     }
-    else{
+    else {
         x += delta * vx;
         y += delta * vy;
         slideX = 0;
         slideY = 0;
+        superSlideX = 0;
+        superSlideY = 0;
     }
 
-    
+
 
     //if (isColliding) {
     //    //printf("COLLIDING\n");
@@ -164,61 +173,62 @@ void Player::update(float delta) {
     }
 
     switch (state) {
-        case AnimState::IDLE:
-            if (frame >= (IDLE_ANIMATION) * updatesPerFrame - 1) {
-                frame = 0;
-            }
-            else {
-                frame++;
-            }
-            break;
-        case AnimState::WALK:
-            if (frame >= (WALK_ANIMATION) * updatesPerFrame - 1) {
-                frame = 0;
-            }
-            else {
-                frame++;
-            }
-            break;
-        case AnimState::PUNCH:
-            if (frame >= (PUNCH_ANIMATION) * updatesPerFrame - 1) {
-                setAnimState(AnimState::IDLE);
-            }
-            else {
-                frame++;
-                if (frame == PUNCH_ANIMATION * updatesPerFrame - 15) {
-                    // Activate the fist
-                    if (flip == SDL_FLIP_HORIZONTAL) {
-                        fist->set_x(this->x + 33);
-                        fist->set_y(this->y + 12);
-                    }
-                    else {
-                        fist->set_x(this->x - 10);
-                        fist->set_y(this->y + 12);
-                    }
-                    fist->update(delta);
-                    fist->set_active(true);
+    case AnimState::IDLE:
+        if (frame >= (IDLE_ANIMATION)*updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+    case AnimState::WALK:
+        if (frame >= (WALK_ANIMATION)*updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+    case AnimState::PUNCH:
+        if (frame >= (PUNCH_ANIMATION)*updatesPerFrame - 1) {
+            setAnimState(AnimState::IDLE);
+        }
+        else {
+            frame++;
+            if (frame == PUNCH_ANIMATION * updatesPerFrame - 15) {
+                // Activate the fist
+                if (flip == SDL_FLIP_HORIZONTAL) {
+                    fist->set_x(this->x + 33);
+                    fist->set_y(this->y + 12);
                 }
                 else {
-                    fist->set_active(false);
+                    fist->set_x(this->x - 10);
+                    fist->set_y(this->y + 12);
                 }
+                fist->update(delta);
+                fist->set_active(true);
             }
-            break;
+            else {
+                fist->set_active(false);
+            }
+        }
+        break;
     }
 
     //check_bounds();
 
+        
+    // Update hitbox
     hitbox->update_pos(x, y, angle);
-
-
     // Update camera
-    camera->setDestination((int)x, (int)y);
-    
+    //camera->setDestination((int)x, (int)y);
+    camera->setPos((int)x, (int)y);
+
 }
 
 void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera) {
-	SDL_Texture* texture;
-	texture = resources->get_texture("dwarf", 1);
+    SDL_Texture* texture;
+    texture = resources->get_texture("dwarf", 1);
 
     int texture_width, texture_height;
     SDL_QueryTexture(texture, NULL, NULL, &texture_width, &texture_height);
@@ -232,8 +242,8 @@ void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, C
     /*SDL_RenderCopyEx(renderer, texture, NULL, &dst, angle / M_PI * 180 + 90,
         NULL, SDL_FLIP_NONE);*/
 
-    
-    SDL_RenderCopyEx(renderer, texture, &anim_rects[frame/updatesPerFrame + startFrame], &dst, angle, NULL, flip);
+
+    SDL_RenderCopyEx(renderer, texture, &anim_rects[frame / updatesPerFrame + startFrame], &dst, angle, NULL, flip);
 
     //DEBUG Render hitbox
     if (DEBUG) {
@@ -316,10 +326,10 @@ void Player::handle_inputs(float delta, InputHandler* inputs) {
         //    vy *= friction_coeff;
         //}
 
-        if (activate_friction_x ) {
+        if (activate_friction_x) {
             vx *= friction_coeff;
         }
-        if (activate_friction_y ) {
+        if (activate_friction_y) {
             vy *= friction_coeff;
         }
 
@@ -349,8 +359,8 @@ const bool Player::collides() {
 
 // Checks for collisions
 bool Player::does_collide(GameActorType type) {
-    return type == GameActorType::DESTRUCTABLE 
-        || type == GameActorType::ENEMY 
+    return type == GameActorType::DESTRUCTABLE
+        || type == GameActorType::ENEMY
         || type == GameActorType::ROCK;
 }
 
@@ -382,9 +392,6 @@ void Player::collide_actor(GameActor* actor) {
 
 }
 
-
-
-
 void Player::collide_tile(Tile* tile)
 {
     isColliding = true;
@@ -395,51 +402,31 @@ void Player::collide_tile(Tile* tile)
     r.w = 32;
     r.h = 32;
 
-    // Side points
-    SDL_Point tp, bp, lp, rp;
-    tp.x = x + WIDTH / 2;
-    tp.y = y;
-    bp.x = x + WIDTH / 2;
-    bp.y = y + HEIGHT;
-    lp.x = x;
-    lp.y = y + HEIGHT / 2;
-    rp.x = x + WIDTH;
-    rp.y = y + HEIGHT / 2;
-
-    // Corner points
-    SDL_Point tlp, blp, trp, brp;
-    tlp.x = x;
-    tlp.y = y;
-    blp.x = x;
-    blp.y = y + HEIGHT;
-    trp.x = x + WIDTH;
-    trp.y = y;
-    brp.x = x + WIDTH;
-    brp.y = y + HEIGHT;
+    
 
     //check to see if i'm colliding at the top, bottom, left, or right
-    if (SDL_PointInRect(&rp, &r)) {
+    if (SDL_PointInRect(&hitbox->get_rp(), &r)) {
         //the right side is colliding
         if (vx > 0) {
             vx = 0;
         }
         collision_flags = collision_flags | RIGHT;
     }
-    if (SDL_PointInRect(&lp, &r)) {
+    if (SDL_PointInRect(&hitbox->get_lp(), &r)) {
         // the left side is colliding
         if (vx < 0) {
             vx = 0;
         }
         collision_flags = collision_flags | LEFT;
     }
-    if (SDL_PointInRect(&bp, &r)) {
+    if (SDL_PointInRect(&hitbox->get_bp(), &r)) {
         // the bottom side is colliding
         if (vy > 0) {
             vy = 0;
         }
         collision_flags = collision_flags | BOTTOM;
     }
-    if (SDL_PointInRect(&tp, &r)) {
+    if (SDL_PointInRect(&hitbox->get_tp(), &r)) {
         // the top side is colliding
         if (vy < 0) {
             vy = 0;
@@ -447,29 +434,65 @@ void Player::collide_tile(Tile* tile)
         collision_flags = collision_flags | TOP;
     }
 
-        //check to see if i'm colliding at the corners
-        if (SDL_PointInRect(&tlp, &r)) {
-            //the top left corner is colliding
+    //check to see if i'm colliding at the corners
+    if (SDL_PointInRect(&hitbox->get_tl(), &r)) {
+        //the top left corner is colliding
 
-            collision_flags = collision_flags | TOPLEFT;
-        }
-        if (SDL_PointInRect(&trp, &r)) {
-            // the top right corner is colliding
+        collision_flags = collision_flags | TOPLEFT;
+    }
+    if (SDL_PointInRect(&hitbox->get_tr(), &r)) {
+        // the top right corner is colliding
 
-            collision_flags = collision_flags | TOPRIGHT;
-        }
-        if (SDL_PointInRect(&blp, &r)) {
-            // the bottom left corner is colliding
+        collision_flags = collision_flags | TOPRIGHT;
+    }
+    if (SDL_PointInRect(&hitbox->get_bl(), &r)) {
+        // the bottom left corner is colliding
 
-            collision_flags = collision_flags | BOTTOMLEFT;
-        }
-        if (SDL_PointInRect(&brp, &r)) {
-            // the bottom right is colliding
+        collision_flags = collision_flags | BOTTOMLEFT;
+    }
+    if (SDL_PointInRect(&hitbox->get_br(), &r)) {
+        // the bottom right is colliding
 
-            collision_flags = collision_flags | BOTTOMRIGHT;
+        collision_flags = collision_flags | BOTTOMRIGHT;
+    }
+
+    //INNER POINT CHECK
+    //check to see if i'm colliding at the top, bottom, left, or right
+    float superSlideForce = 30.0f;
+    if (SDL_PointInRect(&hitbox->get_irp(), &r)) {
+        //the right side is colliding
+        if (vx > 0) {
+            vx = 0;
         }
-    
-    
+        superSlideX = -superSlideForce;
+        inner_collision_flags = inner_collision_flags | RIGHT;
+    }
+    if (SDL_PointInRect(&hitbox->get_ilp(), &r)) {
+        // the left side is colliding
+        if (vx < 0) {
+            vx = 0;
+        }
+        superSlideX = superSlideForce;
+        inner_collision_flags = inner_collision_flags | LEFT;
+    }
+    if (SDL_PointInRect(&hitbox->get_ibp(), &r)) {
+        // the bottom side is colliding
+        if (vy > 0) {
+            vy = 0;
+        }
+        superSlideY = -superSlideForce;
+        inner_collision_flags = inner_collision_flags | BOTTOM;
+    }
+    if (SDL_PointInRect(&hitbox->get_itp(), &r)) {
+        // the top side is colliding
+        if (vy < 0) {
+            vy = 0;
+        }
+        superSlideY = superSlideForce;
+        inner_collision_flags = inner_collision_flags | TOP;
+    }
+
+
 
 
 
@@ -479,14 +502,30 @@ void Player::collide_tile(Tile* tile)
     //TODO: why do i add 16 to y as well? I thought sdl originated top left?
     //The positive y axis points down, do the origin is found by adding half the width and half the height to x and y
 
-    //if(collision_flags > 0 && ((collision_flags & 0x0f) == 0)) // we are dealing with only corners
-        calculate_slide(tile->x * 32 +16, tile->y * 32 + 16);
+    // if this is a corner collision, then calculate slide
+    if (collision_flags > 15)
+        calculate_slide(tile->x * 32 + 16, tile->y * 32 + 16);
 
 
 
+}
+
+void Player::resolve_collisions()
+{
     //Temp variables
     float tvx = vx;
     float tvy = vy;
+
+    //if we are only dealing with corner collisions, then activate slide
+    if (collision_flags > 0 && ((collision_flags & 0x0f) == 0)) {
+        printf("Sliding\n");
+    }
+    else {
+        //deactivate slide
+        slideX = 0;
+        slideY = 0;
+    }
+        
 
     //If I only have side and corner collisions on the same side, I go with the corner collision
 
@@ -495,27 +534,27 @@ void Player::collide_tile(Tile* tile)
     {
         if ((collision_flags & RIGHT) == RIGHT) {
 
-                tvx = std::min(vx, 0.0f);
-                printf("Colliding: RIGHT ");
-            
+            tvx = std::min(vx, 0.0f);
+            printf("Colliding: RIGHT ");
+
         }
         if ((collision_flags & LEFT) == LEFT) {
 
-                tvx = std::max(vx, 0.0f);
-                printf("Colliding: LEFT ");
-            
+            tvx = std::max(vx, 0.0f);
+            printf("Colliding: LEFT ");
+
         }
         if ((collision_flags & TOP) == TOP) {
 
-                tvy = std::max(vy, 0.0f);
-                printf("Colliding: TOP ");
-            
+            tvy = std::max(vy, 0.0f);
+            printf("Colliding: TOP ");
+
         }
         if ((collision_flags & BOTTOM) == BOTTOM) {
 
-                tvy = std::min(vy, 0.0f);
-                printf("Colliding: BOTTOM ");
-            
+            tvy = std::min(vy, 0.0f);
+            printf("Colliding: BOTTOM ");
+
         }
 
     }
@@ -568,19 +607,24 @@ void Player::collide_tile(Tile* tile)
             }
         }
     }
-    
+
     //apply the adjusted velocity
     x = px + delta * (tvx + superSlideX);
     y = py + delta * (tvy + superSlideY);
 
-
+    //printf("superslide: %f", superSlideY);
+    //printf("slide: %f", slideY);
     printf("\n");
 
-    if (collision_flags == 0)
+    if (collision_flags == 0) {
         isColliding = false;
-    
+    }
 
-    camera->setDestination((int)x, (int)y);
+    hitbox->update_pos(x, y, angle);
+
+    //camera->setDestination((int)x, (int)y);
+
+    camera->setPos((int)x, (int)y);
 }
 
 void Player::calculate_slide(float ax, float ay) {
@@ -599,14 +643,14 @@ void Player::calculate_slide(float ax, float ay) {
     //float dirX = distX / magnitude;
     //float dirY = distY / magnitude;
 
-    if (distX < 30) {
-        superSlideX = distX;
-    }
-    if (distY < 30) {
-        superSlideY = distY;
-    }
-    slideX += distX/2;
-    slideY += distY/2;
+    //if (distX < 30) {
+    //    superSlideX = distX;
+    //}
+    //if (distY < 30) {
+    //    superSlideY = distY;
+    //}
+    slideX += distX / 2;
+    slideY += distY / 2;
 
 }
 
@@ -620,94 +664,94 @@ void Player::take_damage(int damage)
 }
 
 void Player::load_animations() {
-		//Set sprite clips
-		//IDLE
-		anim_rects[0].x = 0;
-		anim_rects[0].y = 0;
-		anim_rects[0].w = 32;
-		anim_rects[0].h = 32;
+    //Set sprite clips
+    //IDLE
+    anim_rects[0].x = 0;
+    anim_rects[0].y = 0;
+    anim_rects[0].w = 32;
+    anim_rects[0].h = 32;
 
-		anim_rects[1].x = 32;
-		anim_rects[1].y = 0;
-		anim_rects[1].w = 32;
-		anim_rects[1].h = 32;
+    anim_rects[1].x = 32;
+    anim_rects[1].y = 0;
+    anim_rects[1].w = 32;
+    anim_rects[1].h = 32;
 
-		//WALK LEFT
-		anim_rects[2].x = 64;
-		anim_rects[2].y = 0;
-		anim_rects[2].w = 32;
-		anim_rects[2].h = 32;
+    //WALK LEFT
+    anim_rects[2].x = 64;
+    anim_rects[2].y = 0;
+    anim_rects[2].w = 32;
+    anim_rects[2].h = 32;
 
-		anim_rects[3].x = 96;
-		anim_rects[3].y = 0;
-		anim_rects[3].w = 32;
-		anim_rects[3].h = 32;
+    anim_rects[3].x = 96;
+    anim_rects[3].y = 0;
+    anim_rects[3].w = 32;
+    anim_rects[3].h = 32;
 
-		anim_rects[4].x = 128;
-		anim_rects[4].y = 0;
-		anim_rects[4].w = 32;
-		anim_rects[4].h = 32;
+    anim_rects[4].x = 128;
+    anim_rects[4].y = 0;
+    anim_rects[4].w = 32;
+    anim_rects[4].h = 32;
 
-		anim_rects[5].x = 160;
-		anim_rects[5].y = 0;
-		anim_rects[5].w = 32;
-		anim_rects[5].h = 32;
+    anim_rects[5].x = 160;
+    anim_rects[5].y = 0;
+    anim_rects[5].w = 32;
+    anim_rects[5].h = 32;
 
-		anim_rects[6].x = 192;
-		anim_rects[6].y = 0;
-		anim_rects[6].w = 32;
-		anim_rects[6].h = 32;
+    anim_rects[6].x = 192;
+    anim_rects[6].y = 0;
+    anim_rects[6].w = 32;
+    anim_rects[6].h = 32;
 
-		anim_rects[7].x = 224;
-		anim_rects[7].y = 0;
-		anim_rects[7].w = 32;
-		anim_rects[7].h = 32;
+    anim_rects[7].x = 224;
+    anim_rects[7].y = 0;
+    anim_rects[7].w = 32;
+    anim_rects[7].h = 32;
 
-		anim_rects[8].x = 256;
-		anim_rects[8].y = 0;
-		anim_rects[8].w = 32;
-		anim_rects[8].h = 32;
+    anim_rects[8].x = 256;
+    anim_rects[8].y = 0;
+    anim_rects[8].w = 32;
+    anim_rects[8].h = 32;
 
-		anim_rects[9].x = 288;
-		anim_rects[9].y = 0;
-		anim_rects[9].w = 32;
-		anim_rects[9].h = 32;
+    anim_rects[9].x = 288;
+    anim_rects[9].y = 0;
+    anim_rects[9].w = 32;
+    anim_rects[9].h = 32;
 
-        // PUNCH
-        anim_rects[10].x = 320;
-        anim_rects[10].y = 0;
-        anim_rects[10].w = 32;
-        anim_rects[10].h = 32;
+    // PUNCH
+    anim_rects[10].x = 320;
+    anim_rects[10].y = 0;
+    anim_rects[10].w = 32;
+    anim_rects[10].h = 32;
 
-        anim_rects[11].x = 352;
-        anim_rects[11].y = 0;
-        anim_rects[11].w = 32;
-        anim_rects[11].h = 32;
+    anim_rects[11].x = 352;
+    anim_rects[11].y = 0;
+    anim_rects[11].w = 32;
+    anim_rects[11].h = 32;
 
-        anim_rects[12].x = 384;
-        anim_rects[12].y = 0;
-        anim_rects[12].w = 32;
-        anim_rects[12].h = 32;
+    anim_rects[12].x = 384;
+    anim_rects[12].y = 0;
+    anim_rects[12].w = 32;
+    anim_rects[12].h = 32;
 
-        anim_rects[13].x = 416;
-        anim_rects[13].y = 0;
-        anim_rects[13].w = 32;
-        anim_rects[13].h = 32;
+    anim_rects[13].x = 416;
+    anim_rects[13].y = 0;
+    anim_rects[13].w = 32;
+    anim_rects[13].h = 32;
 
-        anim_rects[14].x = 448;
-        anim_rects[14].y = 0;
-        anim_rects[14].w = 32;
-        anim_rects[14].h = 32;
+    anim_rects[14].x = 448;
+    anim_rects[14].y = 0;
+    anim_rects[14].w = 32;
+    anim_rects[14].h = 32;
 
-        anim_rects[15].x = 480;
-        anim_rects[15].y = 0;
-        anim_rects[15].w = 32;
-        anim_rects[15].h = 32;
+    anim_rects[15].x = 480;
+    anim_rects[15].y = 0;
+    anim_rects[15].w = 32;
+    anim_rects[15].h = 32;
 
-        anim_rects[16].x = 512;
-        anim_rects[16].y = 0;
-        anim_rects[16].w = 32;
-        anim_rects[16].h = 32;
+    anim_rects[16].x = 512;
+    anim_rects[16].y = 0;
+    anim_rects[16].w = 32;
+    anim_rects[16].h = 32;
 
 
 

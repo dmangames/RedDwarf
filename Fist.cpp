@@ -49,3 +49,7 @@ void Fist::collide_tile(Tile* tile)
 		printf("Set tile health to %d\n", tile->health);
 	}
 }
+
+void Fist::resolve_collisions()
+{
+}

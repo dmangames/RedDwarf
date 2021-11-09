@@ -27,7 +27,7 @@ class Player : public GameActor {
 	bool alive;
 	int player_num;
 	bool isColliding;
-	unsigned char collision_flags;
+	unsigned char collision_flags, inner_collision_flags;
 	float px, py;
 	Fist* fist;
 
@@ -70,6 +70,7 @@ public:
 	bool does_collide(GameActorType id);
 	void collide_actor(GameActor* actor);
 	void collide_tile(Tile* tile);
+	void resolve_collisions();
 	int get_player_num();
 	void load_animations();
 	void take_damage(int damage);

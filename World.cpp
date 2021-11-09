@@ -86,6 +86,11 @@ void World::update(InputHandler* inputs) {
 
     camera->update();
 
+    // Resolve actor collisions
+    for (int i = 0; i < actors.size(); i++) {
+        actors[i]->resolve_collisions();
+    }
+
     // Prune dead entities from entites vector
     for (int i = 0; i < actors.size(); i++) {
         if (!actors[i]->is_alive()) {

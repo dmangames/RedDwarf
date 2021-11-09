@@ -61,6 +61,7 @@ public:
 	virtual bool does_collide(GameActorType type) = 0;
 	virtual void collide_actor(GameActor* actor) = 0;
 	virtual void collide_tile(Tile* tile) = 0;
+	virtual void resolve_collisions() = 0;
 	virtual void take_damage(int damage) = 0;
 
 

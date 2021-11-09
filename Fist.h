@@ -7,5 +7,6 @@ public:
 	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	void collide_actor(GameActor* actor);
 	void collide_tile(Tile* tile);
+	void resolve_collisions();
 
 };

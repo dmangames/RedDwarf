@@ -15,7 +15,9 @@ class Hitbox {
 	int x_offset, y_offset, w, h;
 	float angle;
 	float radius, circle_radius;
-	SDL_Point tl, tr, bl, br;
+	SDL_Point tp, bp, lp, rp; //side points
+	SDL_Point tl, tr, bl, br; //corner points
+	SDL_Point itp, ibp, ilp, irp; //inner points
 	HitboxType type;
 	SDL_Rect* rect;
 
@@ -27,10 +29,18 @@ public:
 	int get_center_y();
 	float get_radius();
 	float get_circle_radius();
-	SDL_Point get_tl();
-	SDL_Point get_tr();
-	SDL_Point get_bl();
-	SDL_Point get_br();
+	SDL_Point& get_tp();
+	SDL_Point& get_bp();
+	SDL_Point& get_lp();
+	SDL_Point& get_rp();
+	SDL_Point& get_tl();
+	SDL_Point& get_tr();
+	SDL_Point& get_bl();
+	SDL_Point& get_br();
+	SDL_Point& get_itp();
+	SDL_Point& get_ibp();
+	SDL_Point& get_ilp();
+	SDL_Point& get_irp();
 	float get_width();
 	float get_height();
 	float get_x();

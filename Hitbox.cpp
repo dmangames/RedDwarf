@@ -47,38 +47,59 @@ void Hitbox::update_pos(float x, float y, float angle) {
 	float cx = this->x + w / 2.0f;
 	float cy = this->y + h / 2.0f;
 
-	// Method for rotating corners:
-	// 1. Translate corner relative to center of rectangle (center is the origin)
-	// 2. Rotate about the origin
-	// 3. Translate back to center of rectangle
+	// Side points
+	tp.x = cx;
+	tp.y = this->y;
+	bp.x = cx;
+	bp.y = this->y + h;
+	lp.x = this->x;
+	lp.y = cy;
+	rp.x = this->x + w;
+	rp.y = cy;
 
-	// Top Left Corner
-	tl.x = -w / 2;
-	tl.y = -h / 2;
-	rotate_point(&tl.x, &tl.y, angle);
-	tl.x += cx;
-	tl.y += cy;
+	// Corner points
+	tl.x = this->x;
+	tl.y = this->y;
+	bl.x = this->x;
+	bl.y = this->y + h;
+	tr.x = this->x + w;
+	tr.y = this->y;
+	br.x = this->x + w;
+	br.y = this->y + h;
 
-	// Top Right Corner
-	tr.x = w / 2;
-	tr.y = -h / 2;
-	rotate_point(&tr.x, &tr.y, angle);
-	tr.x += cx;
-	tr.y += cy;
+	// Inner points
+	itp.x = tp.x;
+	itp.y = tp.y + 2;
+	ibp.x = bp.x;
+	ibp.y = bp.y - 2;
+	ilp.x = lp.x + 2;
+	ilp.y = lp.y;
+	irp.x = rp.x - 2;
+	irp.y = rp.y;
 
-	// Bottom Left Corner
-	bl.x = -w / 2;
-	bl.y = h / 2;
-	rotate_point(&bl.x, &bl.y, angle);
-	bl.x += cx;
-	bl.y += cy;
+	//// Top Left Corner
+	//tl.x = -w / 2;
+	//tl.y = -h / 2;
+	//tl.x += cx;
+	//tl.y += cy;
 
-	// Bottom Right Corner
-	br.x = w / 2;
-	br.y = h / 2;
-	rotate_point(&br.x, &br.y, angle);
-	br.x += cx;
-	br.y += cy;
+	//// Top Right Corner
+	//tr.x = w / 2;
+	//tr.y = -h / 2;
+	//tr.x += cx;
+	//tr.y += cy;
+
+	//// Bottom Left Corner
+	//bl.x = -w / 2;
+	//bl.y = h / 2;
+	//bl.x += cx;
+	//bl.y += cy;
+
+	//// Bottom Right Corner
+	//br.x = w / 2;
+	//br.y = h / 2;
+	//br.x += cx;
+	//br.y += cy;
 
 }
 
@@ -160,21 +181,67 @@ float Hitbox::get_circle_radius() {
 	return circle_radius;
 }
 
-SDL_Point Hitbox::get_tl() {
+//Get top left point
+SDL_Point& Hitbox::get_tl() {
 	return tl;
 }
 
-SDL_Point Hitbox::get_tr() {
+//Get top right point
+SDL_Point& Hitbox::get_tr() {
 	return tr;
 }
 
-SDL_Point Hitbox::get_bl() {
+//Get bottom left point
+SDL_Point& Hitbox::get_bl() {
 	return bl;
 }
 
-SDL_Point Hitbox::get_br() {
+//Get bottom right point
+SDL_Point& Hitbox::get_br() {
 	return br;
 }
+
+//Get top point
+SDL_Point& Hitbox::get_tp() {
+	return tp;
+}
+
+//Get bottom point
+SDL_Point& Hitbox::get_bp() {
+	return bp;
+}
+
+//Get left point
+SDL_Point& Hitbox::get_lp() {
+	return lp;
+}
+
+//Get right point
+SDL_Point& Hitbox::get_rp() {
+	return rp;
+}
+
+//Get inner top point
+SDL_Point& Hitbox::get_itp() {
+	return itp;
+}
+
+//Get inner bottom point
+SDL_Point& Hitbox::get_ibp() {
+	return ibp;
+}
+
+//Get inner left point
+SDL_Point& Hitbox::get_ilp() {
+	return ilp;
+}
+
+//Get inner right point
+SDL_Point& Hitbox::get_irp() {
+	return irp;
+}
+
+
 
 float Hitbox::get_width() {
 	return w;

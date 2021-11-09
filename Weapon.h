@@ -18,5 +18,6 @@ public:
 	const bool collides();
 	bool does_collide(GameActorType type);
 	virtual void collide_actor(GameActor* actor) = 0;
+	virtual void resolve_collisions() = 0;
 	void take_damage(int damage);
 };

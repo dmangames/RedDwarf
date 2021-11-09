@@ -37,9 +37,12 @@ void MapGenerator::random_fill_map()
 		SDL_Point* p = get_random_empty_cell();
 		// Get the cell's neighbors
 		for (auto t : *get_neighboring_cells(p->x, p->y, rand()%15)) {
-			t->type = TileType::EMPTY;
-			t->health = 0;
-			t->max_health = 0;
+			if (t->type != TileType::METAL) {
+				t->type = TileType::EMPTY;
+				t->health = 0;
+				t->max_health = 0;
+			}
+
 		}
 
 	}
