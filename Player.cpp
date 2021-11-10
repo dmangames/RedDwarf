@@ -518,7 +518,7 @@ void Player::resolve_collisions()
 
     //if we are only dealing with corner collisions, then activate slide
     if (collision_flags > 0 && ((collision_flags & 0x0f) == 0)) {
-        printf("Sliding\n");
+        if(DEBUG)printf("Sliding\n");
     }
     else {
         //deactivate slide
@@ -535,25 +535,25 @@ void Player::resolve_collisions()
         if ((collision_flags & RIGHT) == RIGHT) {
 
             tvx = std::min(vx, 0.0f);
-            printf("Colliding: RIGHT ");
+            if(DEBUG)printf("Colliding: RIGHT ");
 
         }
         if ((collision_flags & LEFT) == LEFT) {
 
             tvx = std::max(vx, 0.0f);
-            printf("Colliding: LEFT ");
+            if (DEBUG)printf("Colliding: LEFT ");
 
         }
         if ((collision_flags & TOP) == TOP) {
 
             tvy = std::max(vy, 0.0f);
-            printf("Colliding: TOP ");
+            if (DEBUG)printf("Colliding: TOP ");
 
         }
         if ((collision_flags & BOTTOM) == BOTTOM) {
 
             tvy = std::min(vy, 0.0f);
-            printf("Colliding: BOTTOM ");
+            if (DEBUG)printf("Colliding: BOTTOM ");
 
         }
 
@@ -570,7 +570,7 @@ void Player::resolve_collisions()
                     tvx = slideX;
                     //tvy = (vy + slideY) / 2;
                 }
-                printf("Colliding: TOPLEFT ");
+                if (DEBUG)printf("Colliding: TOPLEFT ");
             }
             if ((collision_flags & TOPRIGHT) == TOPRIGHT) {
                 if (std::abs(vx) > std::abs(vy)) {
@@ -581,7 +581,7 @@ void Player::resolve_collisions()
                     tvx = slideX;
                     //tvy = (vy + slideY) / 2;
                 }
-                printf("Colliding: TOPRIGHT ");
+                if (DEBUG)printf("Colliding: TOPRIGHT ");
             }
             if ((collision_flags & BOTTOMLEFT) == BOTTOMLEFT) {
                 if (std::abs(vx) > std::abs(vy)) {
@@ -592,7 +592,7 @@ void Player::resolve_collisions()
                     tvx = slideX;
                     //tvy = (vy + slideY) / 2;
                 }
-                printf("Colliding: BOTTOMLEFT ");
+                if (DEBUG)printf("Colliding: BOTTOMLEFT ");
             }
             if ((collision_flags & BOTTOMRIGHT) == BOTTOMRIGHT) {
                 if (std::abs(vx) > std::abs(vy)) {
@@ -603,7 +603,7 @@ void Player::resolve_collisions()
                     tvx = slideX;
                     //tvy = (vy + slideY) / 2;
                 }
-                printf("Colliding: BOTTOMRIGHT ");
+                if (DEBUG)printf("Colliding: BOTTOMRIGHT ");
             }
         }
     }
@@ -614,7 +614,7 @@ void Player::resolve_collisions()
 
     //printf("superslide: %f", superSlideY);
     //printf("slide: %f", slideY);
-    printf("\n");
+    if(DEBUG)printf("\n");
 
     if (collision_flags == 0) {
         isColliding = false;

@@ -10,6 +10,7 @@ enum class TileType {
 	DIRT,
 	ROCK,
 	METAL,
+	SPAWNER
 };
 
 struct Tile {
@@ -25,13 +26,17 @@ class MapGenerator {
 	std::string seed;
 	int randomFillPercent;
 	std::vector<std::vector<Tile>>* map;
-	//std::map<std::tuple<int, int>, Tile>* tilemap;
+	std::map<std::tuple<int, int>, Tile>* spawn_loc_map;
 
 	//HELPER FUNCTIONS
 	void random_fill_map();
+	void create_enemy_spawner();
 public:
 	MapGenerator(int width, int height, int randomFillPercent);
 	void generate_map();
+	void add_enemy_spawners(int num);
+	std::tuple<int, int> get_random_spawn_loc();
+	void spawn_random_enemies();
 	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	std::vector<std::vector<Tile>>* get_map();
 	SDL_Point* get_random_empty_cell();

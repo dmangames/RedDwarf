@@ -48,6 +48,16 @@ void MapGenerator::random_fill_map()
 	}
 }
 
+void MapGenerator::create_enemy_spawner() {
+	// Find an empty space
+	SDL_Point* p = get_random_empty_cell();
+	// Create a new tile
+	Tile spawn = { p->x, p->y, 8, 8, TileType::SPAWNER };
+	// Put the new tile in the map and in the spawner map
+	spawn_loc_map->emplace(std::make_tuple(p->x, p->y), spawn);
+	(*map)[p->x][p->y] = spawn;
+}
+
 //PUBLIC FUNCTIONS
 
 //randomFillPercent range should be 1-100
@@ -55,12 +65,29 @@ MapGenerator::MapGenerator(int width, int height, int randomFillPercent) {
 	this->width = width;
 	this->height = height;
 	this->randomFillPercent = randomFillPercent;
-	map = new std::vector<std::vector<Tile>>(width, std::vector<Tile>(height, { 0, 0, 0, 8, TileType::DIRT }));
+	map = new std::vector<std::vector<Tile>>(width, std::vector<Tile>(height, { 0, 0, 8, 8, TileType::DIRT }));
+	spawn_loc_map = new std::map<std::tuple<int, int>, Tile>();
 }
 
 void MapGenerator::generate_map() {
 	random_fill_map();
+	add_enemy_spawners(10);
 }
+
+void MapGenerator::add_enemy_spawners(int num) {
+	for (int i = 0; i < num; i++) {
+		create_enemy_spawner();
+	}
+}
+
+std::tuple<int,int> MapGenerator::get_random_spawn_loc() {
+
+	auto it = spawn_loc_map->begin();
+	std::advance(it, rand() % spawn_loc_map->size());
+	return it->first;
+	
+}
+
 
 void MapGenerator::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera)
 {
@@ -96,6 +123,10 @@ void MapGenerator::render(SDL_Renderer* renderer, Resources* resources, float de
 					texture = resources->get_texture("purplerock", 1);
 					SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32((tile.max_health - tile.health)/2), &dst, 0, NULL, SDL_FLIP_NONE);
 					break;
+			case TileType::SPAWNER:
+				texture = resources->get_texture("spawner", 1);
+				SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(0), &dst, 0, NULL, SDL_FLIP_NONE);
+				break;
 			}
 
 		}

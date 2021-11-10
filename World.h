@@ -8,6 +8,7 @@
 #include "Clock.h"
 #include "Camera.h"
 #include "MapGenerator.h"
+#include "Player.h"
 
 #define NUM_PLAYERS 1
 
@@ -16,16 +17,19 @@ class CollisionManager;
 
 class World {
 
-	static const float respawn_delay;
+	static const float RESPAWN_DELAY, ENEMY_SPAWN_DELAY;
 	int screen_w, screen_h;
 	Clock clock;
 	CollisionManager* collision_manager;
 	Camera* camera;
 	MapGenerator* map_generator;
 	std::vector<GameActor*> actors;
+	std::vector<Player*> players;
 	float player_respawn_timers[NUM_PLAYERS];
+	float enemy_spawn_timer;
 
 	void check_spawn_players();
+	void spawn_enemies();
 
 public:
 

@@ -1,7 +1,7 @@
 #include "Fist.h"
 #include "Rock.h"
 
-#define DEBUG true
+#define DEBUG false
 
 Fist::Fist(float x, float y, int w, int h, int screen_w, int screen_h):
 	Weapon(x, y, w, h, screen_w, screen_h)

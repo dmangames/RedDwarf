@@ -2,14 +2,16 @@
 #include "world.h"
 #include "Player.h"
 #include "Rock.h"
+#include "Enemy.h"
 #include <vector>
 
-#define MAP_SIZE_WIDTH 1000 //screen_w/32 + 10
-#define MAP_SIZE_HEIGHT 1000 //screen_h/32 + 10
+#define MAP_SIZE_WIDTH 20 //screen_w/32 + 10
+#define MAP_SIZE_HEIGHT 20 //screen_h/32 + 10
 
 // STATIC MEMBERS
 
-const float World::respawn_delay = 3.0f;
+const float World::RESPAWN_DELAY = 3.0f;
+const float World::ENEMY_SPAWN_DELAY = 1.0f;
 
 // PRIVATE HELPER FUNCTIONS
 
@@ -28,9 +30,23 @@ void World::check_spawn_players() {
             int spawn_x = ((float)rand()) / RAND_MAX * (screen_w - 64);
             int spawn_y = ((float)rand()) / RAND_MAX * (screen_h - 64);
 
-            actors.push_back(new Player(spawn_x, spawn_y, i + 1, screen_w, screen_h, &actors, camera));
+            Player* p = new Player(spawn_x, spawn_y, i + 1, screen_w, screen_h, &actors, camera);
+            actors.push_back(p);
+            players.push_back(p);
         }
     }
+
+}
+
+void World::spawn_enemies() {
+
+
+    // Get spawn location
+    std::tuple<int, int> t = map_generator->get_random_spawn_loc();
+    int spawn_x = std::get<0>(t) * 32;
+    int spawn_y = std::get<1>(t) * 32;
+
+    actors.push_back(new Enemy(spawn_x, spawn_y, 32, 32, screen_w, screen_h));
 
 }
 
@@ -38,8 +54,11 @@ void World::check_spawn_players() {
 
 World::World(int screen_w, int screen_h) : player_respawn_timers() {
 
+    // Set variables
     this->screen_w = screen_w;
     this->screen_h = screen_h;
+    enemy_spawn_timer = ENEMY_SPAWN_DELAY;
+
     collision_manager = new CollisionManager(&actors);
     camera = new Camera(screen_w, screen_h);
     map_generator = new MapGenerator(MAP_SIZE_WIDTH, MAP_SIZE_HEIGHT, 50);
@@ -47,7 +66,9 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
 
     //actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
     SDL_Point* spawn_point = map_generator->get_random_empty_cell();
-    actors.push_back(new Player(spawn_point->x * 32, spawn_point->y * 32, 1, screen_w, screen_h, &actors, camera));
+    Player* p = new Player(spawn_point->x * 32, spawn_point->y * 32, 1, screen_w, screen_h, &actors, camera);
+    actors.push_back(p);
+    players.push_back(p);
 
 
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
@@ -96,7 +117,7 @@ void World::update(InputHandler* inputs) {
         if (!actors[i]->is_alive()) {
             if (actors[i]->get_id() == GameActorType::PLAYER) {
                 player_respawn_timers[
-                    ((Player*)actors[i])->get_player_num() - 1] = respawn_delay;
+                    ((Player*)actors[i])->get_player_num() - 1] = RESPAWN_DELAY;
             }
             delete actors[i];
             actors[i] = NULL;
@@ -112,6 +133,15 @@ void World::update(InputHandler* inputs) {
             if (player_respawn_timers[i] < 0) {
                 player_respawn_timers[i] = 0;
             }
+        }
+    }
+
+    // Spawn enemies if spawn delay is up
+    if (enemy_spawn_timer > 0) {
+        enemy_spawn_timer -= clock.get_delta();
+        if (enemy_spawn_timer < 0) {
+            spawn_enemies();
+            enemy_spawn_timer = ENEMY_SPAWN_DELAY;
         }
     }
 

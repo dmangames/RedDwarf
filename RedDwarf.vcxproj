@@ -149,6 +149,7 @@
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Fist.cpp" />
     <ClCompile Include="FontRenderer.cpp" />
     <ClCompile Include="FPSCounter.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="DestructibleObject.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Fist.h" />
     <ClInclude Include="FontRenderer.h" />
     <ClInclude Include="FPSCounter.h" />
