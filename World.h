@@ -18,6 +18,7 @@ class CollisionManager;
 class World {
 
 	static const float RESPAWN_DELAY, ENEMY_SPAWN_DELAY;
+	int seed;
 	int screen_w, screen_h;
 	Clock clock;
 	CollisionManager* collision_manager;

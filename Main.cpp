@@ -251,8 +251,6 @@ void mainMenu() {
 
 int main(int argc, char* args[])
 {
-	// Init random seed
-	srand(time(NULL));
 
 	InputHandler inputs;
 	Graphics graphics;

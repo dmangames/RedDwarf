@@ -4,9 +4,10 @@
 #include "Rock.h"
 #include "Enemy.h"
 #include <vector>
+#include <ctime>
 
-#define MAP_SIZE_WIDTH 20 //screen_w/32 + 10
-#define MAP_SIZE_HEIGHT 20 //screen_h/32 + 10
+#define MAP_SIZE_WIDTH 100 //screen_w/32 + 10
+#define MAP_SIZE_HEIGHT 100 //screen_h/32 + 10
 
 // STATIC MEMBERS
 
@@ -54,10 +55,21 @@ void World::spawn_enemies() {
 
 World::World(int screen_w, int screen_h) : player_respawn_timers() {
 
+    // Set seed
+    seed = 9456;
+
     // Set variables
     this->screen_w = screen_w;
     this->screen_h = screen_h;
     enemy_spawn_timer = ENEMY_SPAWN_DELAY;
+
+    if (seed == 0) {
+        this->seed = std::time(0);
+    }
+    else {
+        this->seed = seed;
+    }
+    std::srand(seed);
 
     collision_manager = new CollisionManager(&actors);
     camera = new Camera(screen_w, screen_h);
@@ -137,7 +149,7 @@ void World::update(InputHandler* inputs) {
     }
 
     // Spawn enemies if spawn delay is up
-    if (enemy_spawn_timer > 0) {
+    if (enemy_spawn_timer >= 0) {
         enemy_spawn_timer -= clock.get_delta();
         if (enemy_spawn_timer < 0) {
             spawn_enemies();

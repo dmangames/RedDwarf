@@ -1,12 +1,10 @@
 #include "MapGenerator.h"
-#include <ctime>
 #include <cstdlib>
 
 //PRIVATE HELPER FUNCTIONS
 
 void MapGenerator::random_fill_map()
 {
-	std::srand(std::time(0));
 	printf("Random number: %d\n",std::rand());
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < height; y++) {
@@ -136,7 +134,6 @@ void MapGenerator::render(SDL_Renderer* renderer, Resources* resources, float de
 SDL_Point* MapGenerator::get_random_empty_cell()
 {
 	SDL_Point* empty_cell = nullptr;
-	srand(time(NULL));
 	while (empty_cell == nullptr) {
 		int rx = rand() % width;
 		int ry = rand() % height;

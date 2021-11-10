@@ -23,7 +23,7 @@ struct Tile {
 
 class MapGenerator {
 	int width, height;
-	std::string seed;
+	int seed;
 	int randomFillPercent;
 	std::vector<std::vector<Tile>>* map;
 	std::map<std::tuple<int, int>, Tile>* spawn_loc_map;
