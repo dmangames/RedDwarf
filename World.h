@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "MapGenerator.h"
 #include "Player.h"
+#include "AStar.hpp"
 
 #define NUM_PLAYERS 1
 
@@ -17,13 +18,14 @@ class CollisionManager;
 
 class World {
 
-	static const float RESPAWN_DELAY, ENEMY_SPAWN_DELAY;
+	static const float RESPAWN_DELAY, ENEMY_SPAWN_DELAY, ENEMY_PATHFIND_DELAY;
 	int seed;
 	int screen_w, screen_h;
 	Clock clock;
 	CollisionManager* collision_manager;
 	Camera* camera;
 	MapGenerator* map_generator;
+	AStar::Generator path_generator;
 	std::vector<GameActor*> actors;
 	std::vector<Player*> players;
 	float player_respawn_timers[NUM_PLAYERS];
@@ -31,6 +33,8 @@ class World {
 
 	void check_spawn_players();
 	void spawn_enemies();
+
+	void find_path();
 
 public:
 

@@ -116,38 +116,6 @@ void Player::update(float delta) {
         superSlideY = 0;
     }
 
-
-
-    //if (isColliding) {
-    //    //printf("COLLIDING\n");
-    //    // Apply change in x and y directions plus slide to the old position
-    //    x = px + delta * (vx + slideX);
-    //    y = py + delta * (vy + slideY);
-
-    //    //isColliding = false;
-    //}
-    //else {
-    //    px = x;
-    //    py = y;
-    //    // Apply change in x and y directions
-    //    x += delta * vx;
-    //    y += delta * vy;
-    //}
-
-    //x += delta * slideX;
-    //y += delta * slideY;
-
-    //if (!isColliding) {
-    //    slideX = 0;
-    //    slideY = 0;
-    //}
-    //else {
-    //    isColliding = false;
-    //}
-
-
-
-
     // Enforce speed limit
     if (vx > max_speed) {
         vx = max_speed;
@@ -493,9 +461,6 @@ void Player::collide_tile(Tile* tile)
     }
 
 
-
-
-
     //Set back to position that doesn't collide with tile
     /*x = px;
     y = py;*/
@@ -505,8 +470,6 @@ void Player::collide_tile(Tile* tile)
     // if this is a corner collision, then calculate slide
     if (collision_flags > 15)
         calculate_slide(tile->x * 32 + 16, tile->y * 32 + 16);
-
-
 
 }
 

@@ -3,10 +3,11 @@
 #include <string>
 #include "GameActor.h"
 #include "Hitbox.h"
-
+#include "Player.h"
 
 class Enemy : public GameActor {
 	// References
+	Player* player;
 
 	// General Variables
 	float vx, vy;
@@ -16,7 +17,8 @@ class Enemy : public GameActor {
 	float delta;
 	bool alive;
 	bool isColliding;
-
+	float px, py;
+	float bite_cooldown, bite_timer;
 
 
 
@@ -43,7 +45,7 @@ class Enemy : public GameActor {
 
 
 public:
-	Enemy(float x, float y, int w, int h, int screen_w, int screen_h);
+	Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player);
 	void update(float delta);
 	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	bool is_alive();

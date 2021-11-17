@@ -5,6 +5,8 @@
 #include "Enemy.h"
 #include <vector>
 #include <ctime>
+#include "AStar.hpp"
+#include <iostream>
 
 #define MAP_SIZE_WIDTH 100 //screen_w/32 + 10
 #define MAP_SIZE_HEIGHT 100 //screen_h/32 + 10
@@ -13,6 +15,7 @@
 
 const float World::RESPAWN_DELAY = 3.0f;
 const float World::ENEMY_SPAWN_DELAY = 1.0f;
+const float World::ENEMY_PATHFIND_DELAY = 1.0f;
 
 // PRIVATE HELPER FUNCTIONS
 
@@ -47,8 +50,19 @@ void World::spawn_enemies() {
     int spawn_x = std::get<0>(t) * 32;
     int spawn_y = std::get<1>(t) * 32;
 
-    actors.push_back(new Enemy(spawn_x, spawn_y, 32, 32, screen_w, screen_h));
+    actors.push_back(new Enemy(spawn_x, spawn_y, 32, 32, screen_w, screen_h, players[0]));
 
+}
+
+void World::find_path() {
+
+    std::cout << "Generate path ... \n";
+    // This method returns vector of coordinates from target to source.
+    auto path = path_generator.findPath({ 0, 0 }, { 20, 20 }, get_map());
+
+    for (auto& coordinate : path) {
+        std::cout << coordinate.x << " " << coordinate.y << "\n";
+    }
 }
 
 // PUBLIC FUNCTIONS
@@ -85,8 +99,16 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
 
     //actors.push_back(new Player(screen_w * 5 / 6 - 32, screen_h / 2 - 32, 2, screen_w, screen_h, &actors));
 
-
     delete spawn_point;
+
+    // Set up AI pathfinding
+    // Set 2d map size.
+    path_generator.setWorldSize({ MAP_SIZE_WIDTH, MAP_SIZE_HEIGHT });
+    // You can use a few heuristics : manhattan, euclidean or octagonal.
+    path_generator.setHeuristic(AStar::Heuristic::euclidean);
+    path_generator.setDiagonalMovement(false);
+
+
 }
 
 // Main cycle running game logic (inputs, physics, mechanics, etc.)
@@ -110,6 +132,9 @@ void World::update(InputHandler* inputs) {
     for (int i = 0; i < actors.size(); i++) {
         actors[i]->update(clock.get_delta());
     }
+
+    // Run AI Pathfinding
+    //find_path();
 
     // Check for collisions
     collision_manager->check_collisions();
@@ -156,6 +181,7 @@ void World::update(InputHandler* inputs) {
             enemy_spawn_timer = ENEMY_SPAWN_DELAY;
         }
     }
+
 
 }
 
