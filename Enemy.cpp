@@ -141,6 +141,8 @@ void Enemy::update(float delta)
         }
         else {
             frame++;
+            //if we are on the bite down frame, then check to see if the mouth point is in the player
+            
             //if (frame == BITE_ANIMATION * updatesPerFrame - 15) {
             //    // Activate the fist
             //    if (flip == SDL_FLIP_HORIZONTAL) {
@@ -220,6 +222,32 @@ void Enemy::collide_actor(GameActor* actor)
     isColliding = true;
     x = px;
     y = py;
+    // Try to bite the player
+    if (bite_timer <= 0) {
+        if (flip == SDL_FLIP_NONE) {
+            bite_box.x = x + w/2;
+            bite_box.y = y - 2;
+            bite_box.w = w;
+            bite_box.h = h + 4;
+        }
+        else {
+            bite_box.x = x - w/2;
+            bite_box.y = y - 2;
+            bite_box.w = w;
+            bite_box.h = h + 4;
+        }
+        
+
+        SDL_Rect result;
+        //check to see if the player is in the right place
+        
+        if (SDL_IntersectRect(&bite_box, actor->get_hitbox()->get_rect(), &result)) {
+            //we are currently able to bite the player, start the bite
+            setAnimState(AnimState::BITE);
+            bite_timer = bite_cooldown;
+        }
+        
+    }
 }
 
 void Enemy::collide_tile(Tile* tile)

@@ -19,6 +19,8 @@ class Enemy : public GameActor {
 	bool isColliding;
 	float px, py;
 	float bite_cooldown, bite_timer;
+	SDL_Rect bite_box;
+
 
 
 
