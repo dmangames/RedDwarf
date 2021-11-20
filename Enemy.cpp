@@ -5,8 +5,40 @@
 #define WIDTH 32
 #define HEIGHT 32
 #define XOFFSET 16
-#define YOFFSET 10
-#define YADJUST 4
+#define YOFFSET 16
+#define YADJUST 0
+
+//PRIVATE FUNCTIONS
+
+void Enemy::setAnimState(AnimState s) {
+    switch (s) {
+    case AnimState::IDLE:
+        if (state != AnimState::IDLE) {
+            state = AnimState::IDLE;
+            startFrame = IDLE_ANIMATION_START;
+            updatesPerFrame = IDLE_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    case AnimState::WALK:
+        if (state != AnimState::WALK) {
+            state = AnimState::WALK;
+            startFrame = WALK_ANIMATION_START;
+            updatesPerFrame = WALK_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    case AnimState::BITE:
+        if (state != AnimState::BITE) {
+            state = AnimState::BITE;
+            startFrame = BITE_ANIMATION_START;
+            updatesPerFrame = BITE_UPDATE_RATE;
+            frame = 0;
+        }
+        break;
+    }
+}
+
 
 Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player)
 	: GameActor(x, y, w, h, screen_w, screen_h)
@@ -26,13 +58,12 @@ Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player*
     angle = 0;
     alive = true;
     isColliding = false;
-    frame = 0;
-    startFrame = 0;
+    frame = 1;
+    startFrame = 1;
     updatesPerFrame = 16;
     bite_cooldown = 3.0f;
     bite_timer = 0;
 
-    load_animations();
     // Update hitbox
     hitbox->update_pos(x, y, angle);
 }
@@ -76,6 +107,60 @@ void Enemy::update(float delta)
     x = px + vx * delta;
     y = py + vy * delta;
 
+    //Set anim states
+    if (state == AnimState::BITE) {
+
+    }
+    else if (abs(vy) < 3.0f && abs(vx) < 3.0f) {
+        setAnimState(AnimState::IDLE);
+    }
+    else {
+        setAnimState(AnimState::WALK);
+    }
+
+    switch (state) {
+    case AnimState::IDLE:
+        if (frame >= (IDLE_ANIMATION)*updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+    case AnimState::WALK:
+        if (frame >= (WALK_ANIMATION)*updatesPerFrame - 1) {
+            frame = 0;
+        }
+        else {
+            frame++;
+        }
+        break;
+    case AnimState::BITE:
+        if (frame >= (BITE_ANIMATION)*updatesPerFrame - 1) {
+            setAnimState(AnimState::IDLE);
+        }
+        else {
+            frame++;
+            //if (frame == BITE_ANIMATION * updatesPerFrame - 15) {
+            //    // Activate the fist
+            //    if (flip == SDL_FLIP_HORIZONTAL) {
+            //        fist->set_x(this->x + 33);
+            //        fist->set_y(this->y + 12);
+            //    }
+            //    else {
+            //        fist->set_x(this->x - 10);
+            //        fist->set_y(this->y + 12);
+            //    }
+            //    fist->update(delta);
+            //    fist->set_active(true);
+            //}
+            //else {
+            //    fist->set_active(false);
+            //}
+        }
+        break;
+    }
+
     //Decrease bite timer
     if(bite_timer > 0)
         bite_timer -= delta;
@@ -101,7 +186,7 @@ void Enemy::render(SDL_Renderer* renderer, Resources* resources, float delta, Ca
 
     //SDL_RenderCopyEx(renderer, texture, &anim_rects[frame / updatesPerFrame + startFrame], &dst, angle, NULL, flip);
 
-    SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(0), &dst, angle, NULL, flip);
+    SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(startFrame + frame/updatesPerFrame), &dst, angle, NULL, flip);
 
     //DEBUG Render hitbox
     if (DEBUG) {
@@ -148,6 +233,7 @@ void Enemy::collide_tile(Tile* tile)
         if (tile->health <= 0) {
             tile->type = TileType::EMPTY;
         }
+        setAnimState(AnimState::BITE);
         bite_timer = bite_cooldown;
     }
 
@@ -158,9 +244,6 @@ void Enemy::resolve_collisions()
     isColliding = false;
 }
 
-void Enemy::load_animations()
-{
-}
 
 void Enemy::take_damage(int damage)
 {

@@ -112,8 +112,7 @@ SDL_Rect* Resources::get_anim_rect_32(int frame)
 }
 
 void Resources::load_animations() {
-	//Set sprite clips
-	// Destruction
+	//Set sprite clips to be reused
 	anim_rects_32[0].x = 0;
 	anim_rects_32[0].y = 0;
 	anim_rects_32[0].w = 32;
@@ -153,6 +152,86 @@ void Resources::load_animations() {
 	anim_rects_32[7].y = 0;
 	anim_rects_32[7].w = 32;
 	anim_rects_32[7].h = 32;
+
+	anim_rects_32[8].x = 256;
+	anim_rects_32[8].y = 0;
+	anim_rects_32[8].w = 32;
+	anim_rects_32[8].h = 32;
+
+	anim_rects_32[9].x = 288;
+	anim_rects_32[9].y = 0;
+	anim_rects_32[9].w = 32;
+	anim_rects_32[9].h = 32; 
+
+	anim_rects_32[10].x = 320;
+	anim_rects_32[10].y = 0;
+	anim_rects_32[10].w = 32;
+	anim_rects_32[10].h = 32;
+
+	anim_rects_32[11].x = 352;
+	anim_rects_32[11].y = 0;
+	anim_rects_32[11].w = 32;
+	anim_rects_32[11].h = 32;
+
+	anim_rects_32[12].x = 384;
+	anim_rects_32[12].y = 0;
+	anim_rects_32[12].w = 32;
+	anim_rects_32[12].h = 32;
+
+	anim_rects_32[13].x = 416;
+	anim_rects_32[13].y = 0;
+	anim_rects_32[13].w = 32;
+	anim_rects_32[13].h = 32;
+
+	anim_rects_32[14].x = 448;
+	anim_rects_32[14].y = 0;
+	anim_rects_32[14].w = 32;
+	anim_rects_32[14].h = 32;
+
+	anim_rects_32[15].x = 480;
+	anim_rects_32[15].y = 0;
+	anim_rects_32[15].w = 32;
+	anim_rects_32[15].h = 32;
+
+	anim_rects_32[16].x = 512;
+	anim_rects_32[16].y = 0;
+	anim_rects_32[16].w = 32;
+	anim_rects_32[16].h = 32;
+
+	anim_rects_32[17].x = 544;
+	anim_rects_32[17].y = 0;
+	anim_rects_32[17].w = 32;
+	anim_rects_32[17].h = 32;
+
+	anim_rects_32[18].x = 576;
+	anim_rects_32[18].y = 0;
+	anim_rects_32[18].w = 32;
+	anim_rects_32[18].h = 32;
+
+	anim_rects_32[19].x = 608;
+	anim_rects_32[19].y = 0;
+	anim_rects_32[19].w = 32;
+	anim_rects_32[19].h = 32;
+
+	anim_rects_32[20].x = 640;
+	anim_rects_32[20].y = 0;
+	anim_rects_32[20].w = 32;
+	anim_rects_32[20].h = 32;
+
+	anim_rects_32[21].x = 672;
+	anim_rects_32[21].y = 0;
+	anim_rects_32[21].w = 32;
+	anim_rects_32[21].h = 32;
+
+	anim_rects_32[22].x = 704;
+	anim_rects_32[22].y = 0;
+	anim_rects_32[22].w = 32;
+	anim_rects_32[22].h = 32;
+
+	anim_rects_32[23].x = 736;
+	anim_rects_32[23].y = 0;
+	anim_rects_32[23].w = 32;
+	anim_rects_32[23].h = 32;
 
 
 }

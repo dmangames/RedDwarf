@@ -14,7 +14,7 @@ class Resources {
 	SDL_Renderer* renderer;
 	bool load_font(TTF_Font** font, std::string filename, int size);
 	bool load_texture(SDL_Texture** texture, std::string filename);
-	SDL_Rect anim_rects_32[10];
+	SDL_Rect anim_rects_32[30];
 
 	// Private helpers
 	void load_animations();

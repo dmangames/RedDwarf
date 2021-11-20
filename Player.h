@@ -9,7 +9,8 @@
 enum class AnimState {
 	IDLE,
 	WALK,
-	PUNCH
+	PUNCH,
+	BITE
 };
 
 class Player : public GameActor {
