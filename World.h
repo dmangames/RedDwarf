@@ -10,6 +10,8 @@
 #include "MapGenerator.h"
 #include "Player.h"
 #include "AStar.hpp"
+#include "Item.h"
+#include "TileItem.h"
 
 #define NUM_PLAYERS 1
 
@@ -33,7 +35,7 @@ class World {
 
 	void check_spawn_players();
 	void spawn_enemies();
-
+	void spawn_tile_item(Tile* t);
 	void find_path();
 
 public:

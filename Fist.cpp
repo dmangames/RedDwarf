@@ -41,7 +41,7 @@ void Fist::collide_tile(Tile* tile)
 		printf("Applying Damage from Fist!\n");
 		tile->health = tile->health - 1;
 		if (tile->health <= 0) {
-			tile->type = TileType::EMPTY;
+			//tile->type = TileType::EMPTY;
 			tile->health = 0;
 			tile->max_health = 0;
 		}

@@ -259,7 +259,9 @@ void Enemy::collide_tile(Tile* tile)
     if (bite_timer <= 0) {
         tile->health = tile->health - 1;
         if (tile->health <= 0) {
-            tile->type = TileType::EMPTY;
+            //tile->type = TileType::EMPTY;
+            tile->health = 0;
+            tile->max_health = 0;
         }
         setAnimState(AnimState::BITE);
         bite_timer = bite_cooldown;

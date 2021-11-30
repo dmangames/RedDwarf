@@ -41,13 +41,23 @@ GameActor::GameActor() {
 	active = true;
 }
 
+GameActor::GameActor(float x, float y, int w, int h)
+{
+	this->x = x;
+	this->y = y;
+	this->w = w;
+	this->h = h;
+	this->screen_w = 0;
+	this->screen_h = 0;
+}
+
 GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h) {
-	x = x;
-	y = y;
-	w = w;
-	h = h;
-	screen_w = screen_w;
-	screen_h = screen_h;
+	this->x = x;
+	this->y = y;
+	this->w = w;
+	this->h = h;
+	this->screen_w = screen_w;
+	this->screen_h = screen_h;
 	hitbox = NULL;
 	active = true;
 }
@@ -85,19 +95,7 @@ GameActor::~GameActor() {
 		delete hitbox;
 	}
 }
-//GameActor::GameActor(std::string name, int idleFrames, int walkingFrames) {
-//	m_name = name;
-//	setPos(0, 0);
-//	IDLE_ANIMATION_FRAMES = idleFrames;
-//	WALKING_ANIMATION_FRAMES = walkingFrames;
-//}
 
-
-//GameActor::GameActor(std::string name, Animation aList[]) {
-//	m_name = name;
-//	setPos(0, 0);
-//	//Copy the animations over
-//	for (int i = 0; i < sizeof(aList)/sizeof(Animation); i++) {
-//		animations[i] = aList[i];
-//	}
-//}
+void GameActor::take_damage(int damage)
+{
+}

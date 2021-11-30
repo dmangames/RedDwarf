@@ -159,6 +159,28 @@ std::vector<Tile*>* MapGenerator::get_neighboring_cells(int x, int y, int range)
 	return neighbors;
 }
 
+std::vector<Tile*>* MapGenerator::get_destroyed_tiles_onscreen(Camera* camera)
+{
+	std::vector<Tile*>* destroyed_tiles = new std::vector<Tile*>();
+	//Loop through only the tiles in the camera view for rendering
+	int x_start = std::max(camera->get_x_offset() / 32, 0);
+	int x_finish = std::min(x_start + camera->get_width() / 32 + 2, width);
+	int y_start = std::max(camera->get_y_offset() / 32, 0);
+	int y_finish = std::min(y_start + camera->get_height() / 32 + 2, height);
+	for (int x = x_start; x < x_finish; x++) {
+		for (int y = y_start; y < y_finish; y++) {
+			Tile tile = (*map)[x][y];
+			if (tile.type == TileType::EMPTY)
+				continue;
+			if (tile.max_health == 0) {
+				//add this destroyed tile to list
+				destroyed_tiles->push_back(&(*map)[x][y]);
+			}
+		}
+	}
+	return destroyed_tiles;
+}
+
 std::vector<std::vector<Tile>>* MapGenerator::get_map()
 {
 	return map;

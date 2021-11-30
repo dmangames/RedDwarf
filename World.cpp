@@ -54,6 +54,20 @@ void World::spawn_enemies() {
 
 }
 
+void World::spawn_tile_item(Tile* t) {
+
+
+    // Get spawn location
+    int spawn_x = (t->x * 32);
+    int spawn_y = (t->y * 32);
+
+    actors.push_back(new TileItem(t->type, spawn_x, spawn_y, 16, 16));
+
+    t->type = TileType::EMPTY;
+
+}
+
+
 void World::find_path() {
 
     std::cout << "Generate path ... \n";
@@ -182,6 +196,12 @@ void World::update(InputHandler* inputs) {
         }
     }
 
+    // Spawn items from destroyed tiles
+    auto destroyed_tiles = map_generator->get_destroyed_tiles_onscreen(camera);
+    for (auto t : *destroyed_tiles) {
+        spawn_tile_item(t);
+    }
+    delete destroyed_tiles;
 
 }
 

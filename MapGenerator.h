@@ -4,22 +4,7 @@
 #include <SDL.h>
 #include "Resources.h"
 #include "Camera.h"
-
-enum class TileType {
-	EMPTY,
-	DIRT,
-	ROCK,
-	METAL,
-	SPAWNER
-};
-
-struct Tile {
-	int x;
-	int y;
-	int health;
-	int max_health;
-	TileType type;
-};
+#include "Tile.h"
 
 class MapGenerator {
 	int width, height;
@@ -36,11 +21,11 @@ public:
 	void generate_map();
 	void add_enemy_spawners(int num);
 	std::tuple<int, int> get_random_spawn_loc();
-	void spawn_random_enemies();
 	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	std::vector<std::vector<Tile>>* get_map();
 	SDL_Point* get_random_empty_cell();
 	std::vector<Tile*>* get_neighboring_cells(int x, int y, int range);
+	std::vector<Tile*>* get_destroyed_tiles_onscreen(Camera* camera);
 	int get_width();
 	int get_height();
 	~MapGenerator();

@@ -72,9 +72,11 @@ void Resources::load_resources() {
 	load_texture(&textures["main_menu"][1], "red_dwarf_main_menu_art.png");
 	load_texture(&textures["dwarf"][1], "dwarf.png");
 	load_texture(&textures["redrock"][1], "redrock_ss.png");
+	load_texture(&textures["redrock"][2], "redrock_item.png");
 	load_texture(&textures["purplerock"][1], "purplerock_ss.png");
 	load_texture(&textures["spawner"][1], "spawn_pit.png");
 	load_texture(&textures["pinkling"][1], "pinkling_ss.png");
+	
 
 	// ANIMATION FRAMES
 	load_animations();

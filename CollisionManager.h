@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "GameActor.h"
-
+#include "MapGenerator.h"
 
 class CollisionManager {
 
