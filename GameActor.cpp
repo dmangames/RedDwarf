@@ -96,6 +96,29 @@ GameActor::~GameActor() {
 	}
 }
 
+void GameActor::render_text(FontRenderer* font_renderer, SDL_Renderer* renderer, Resources* resources, Camera* camera, std::string text)
+{
+	// Texture to hold the drawn text
+	SDL_Texture* text_texture = NULL;
+	int text_width;
+	int text_height;
+	SDL_Color color = { 255, 255, 255, 255 };
+
+	font_renderer->load_font_texture(&text_texture, "lazy", text, color);
+	SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+
+	SDL_Rect dst = {
+		x,
+		y,
+		text_width,
+		text_height
+	};
+
+	SDL_RenderCopy(renderer, text_texture, NULL, &dst);
+
+	SDL_DestroyTexture(text_texture);
+}
+
 void GameActor::take_damage(int damage)
 {
 }

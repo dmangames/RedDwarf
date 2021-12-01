@@ -7,6 +7,9 @@
 #include "Hitbox.h"
 #include "Camera.h"
 #include "Tile.h"
+#include "FontRenderer.h"
+
+class FontRenderer;
 
 enum class GameActorType {
 	PLAYER,
@@ -49,6 +52,7 @@ public:
 	virtual void collide_actor(GameActor* actor) = 0;
 	virtual void collide_tile(Tile* tile) = 0;
 	virtual void resolve_collisions() = 0;
+	virtual void render_text(FontRenderer* font_renderer, SDL_Renderer* renderer, Resources* resources, Camera* camera, std::string text);
 	virtual void take_damage(int damage);
 
 

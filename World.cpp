@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include "world.h"
+#include "World.h"
 #include "Player.h"
 #include "Rock.h"
 #include "Enemy.h"
