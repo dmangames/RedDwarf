@@ -213,6 +213,11 @@ std::vector<GameActor*>* World::get_actors() {
     return &actors;
 }
 
+std::vector<Player*>* World::get_players()
+{
+    return &players;
+}
+
 Camera* World::get_camera() {
     return camera;
 }

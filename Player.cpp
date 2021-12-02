@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "TileItem.h"
 
 #define DEBUG false
 
@@ -329,25 +330,21 @@ const bool Player::collides() {
 bool Player::does_collide(GameActorType type) {
     return type == GameActorType::DESTRUCTABLE
         || type == GameActorType::ENEMY
-        || type == GameActorType::ROCK;
+        || type == GameActorType::ROCK
+        || type == GameActorType::TILEITEM;
 }
 
 void Player::collide_actor(GameActor* actor) {
     switch (actor->get_id()) {
     case GameActorType::DESTRUCTABLE:
-        //printf("Colliding with destructible object.\n");
-        x = px;
-        y = py;
-        camera->setPos((int)x, (int)y);
+        
         break;
-    case GameActorType::ROCK:
-        x = px;
-        y = py;
-        isColliding = true;
-        calculate_slide(actor->get_hitbox()->get_center_x(), actor->get_hitbox()->get_center_y());
-
-        camera->setPos((int)x, (int)y);
+    case GameActorType::TILEITEM:
+    {
+        TileItem* tile_item = static_cast<TileItem*>(actor);
+        minerals += tile_item->get_tile_minerals();
         break;
+    }
     case GameActorType::ENEMY:
         printf("Colliding with enemy object.\n");
         break;
@@ -624,6 +621,30 @@ int Player::get_player_num() {
 void Player::take_damage(int damage)
 {
     //TODO:make player take damage
+}
+
+void Player::render_inventory(FontRenderer* font_renderer, SDL_Renderer* renderer, Resources* resources, Camera* camera)
+{
+    // Texture to hold the drawn text
+    SDL_Texture* text_texture = NULL;
+    int text_width;
+    int text_height;
+    SDL_Color color = { 255, 255, 255, 255 };
+
+    std::string text = "Minerals: " + std::to_string(minerals);
+    font_renderer->load_font_texture(&text_texture, "lazy", text, color);
+    SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+
+    SDL_Rect dst = {
+        300,
+        16,
+        text_width,
+        text_height
+    };
+
+    SDL_RenderCopy(renderer, text_texture, NULL, &dst);
+
+    SDL_DestroyTexture(text_texture);
 }
 
 void Player::load_animations() {

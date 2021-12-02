@@ -44,6 +44,7 @@ public:
 	void update(InputHandler* inputs);
 	float get_delta();
 	std::vector<GameActor*>* get_actors();
+	std::vector<Player*>* get_players();
 	Camera* get_camera();
 	bool generate_map(); //starting x and y position is 0, 0, map width and height determined by MapGenerator
 	MapGenerator* get_map();

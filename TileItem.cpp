@@ -1,6 +1,6 @@
 #include "TileItem.h"
 
-#define DEBUG false
+#define DEBUG true
 
 TileItem::TileItem(TileType type, float x, float y, int w, int h):Item(x, y, w, h)
 {
@@ -11,6 +11,11 @@ TileItem::TileItem(TileType type, float x, float y, int w, int h):Item(x, y, w, 
     default:
         sprite_name = "redrock";
     }
+    printf("Loc X: %f", x);
+
+    active = true;
+    hitbox = new Hitbox(0, 0, w, h, HitboxType::CIRCLE);
+    hitbox->update_pos(x, y, 0);
 }
 
 void TileItem::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera)
@@ -32,5 +37,31 @@ void TileItem::render(SDL_Renderer* renderer, Resources* resources, float delta,
     //DEBUG Render hitbox
     if (DEBUG) {
         hitbox->render_corners(renderer, camera);
+    }
+}
+
+const GameActorType TileItem::get_id()
+{
+    return GameActorType::TILEITEM;
+}
+
+void TileItem::collide_actor(GameActor* actor)
+{
+    //mark for deletion
+    alive = false;
+}
+
+int TileItem::get_tile_minerals()
+{
+    switch (type) {
+    case TileType::DIRT:
+        return 1;
+        break;
+    case TileType::ROCK:
+        return 4;
+        break;
+    case TileType::METAL:
+        return 8;
+
     }
 }

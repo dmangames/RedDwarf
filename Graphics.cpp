@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "Player.h"
 
 const int Graphics::SCREEN_HEIGHT = 720;
 const int Graphics::SCREEN_WIDTH = 1280;
@@ -97,6 +98,15 @@ void Graphics::render_actors(std::vector<GameActor*>* actors, float delta, Camer
 		(*actors)[i]->render(renderer, resources, delta, camera);
 	}
 }
+
+void Graphics::render_players(std::vector<Player*>* players, float delta, Camera* camera) {
+	for (int i = 0; i < players->size(); ++i) {
+		//(*players)[i]->render(renderer, resources, delta, camera);
+		(*players)[i]->render_inventory(font_renderer, renderer, resources, camera);
+	}
+}
+
+
 
 int Graphics::get_width() {
 	return SCREEN_WIDTH;

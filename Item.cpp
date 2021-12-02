@@ -18,7 +18,7 @@ void Item::render(SDL_Renderer* renderer, Resources* resources, float delta, Cam
 
 bool Item::is_alive()
 {
-	return true;
+	return alive;
 }
 
 const GameActorType Item::get_id()

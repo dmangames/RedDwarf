@@ -17,7 +17,8 @@ enum class GameActorType {
 	DESTRUCTABLE,
 	WEAPON,
 	ROCK,
-	ITEM
+	ITEM,
+	TILEITEM
 };
 
 

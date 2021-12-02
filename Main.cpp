@@ -82,6 +82,7 @@ int main(int argc, char* args[])
 				graphics.clear_screen();
 				graphics.render_tiles(world.get_map(), world.get_delta(), world.get_camera());
 				graphics.render_actors(world.get_actors(), world.get_delta(), world.get_camera());
+				graphics.render_players(world.get_players(), world.get_delta(), world.get_camera());
 				graphics.render_overlay();
 
 				graphics.present_renderer(world.get_delta());

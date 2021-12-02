@@ -55,6 +55,9 @@ class Player : public GameActor {
 	AnimState state = AnimState::IDLE;
 
 
+	//Game variables
+	int minerals = 0;
+
 	// Helper Functions
 
 	void setAnimState(AnimState state);
@@ -75,4 +78,5 @@ public:
 	int get_player_num();
 	void load_animations();
 	void take_damage(int damage);
+	void render_inventory(FontRenderer* font_renderer, SDL_Renderer* renderer, Resources* resources, Camera* camera);
 };
