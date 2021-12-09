@@ -40,10 +40,11 @@ void Enemy::setAnimState(AnimState s) {
 }
 
 
-Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player)
+Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player, std::vector<GameActor*>& sharp_things)
 	: GameActor(x, y, w, h, screen_w, screen_h)
 {
     this->player = player;
+    this->enemy_weapons = &sharp_things;
     this->x = x;
     this->y = y;
     this->w = w;
@@ -63,6 +64,12 @@ Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player*
     updatesPerFrame = 16;
     bite_cooldown = 3.0f;
     bite_timer = 0;
+    teeth = new EnemyWeapon(x, y, 4, 4, 1);
+
+    this->enemy_weapons->push_back(teeth);
+
+    //TODO:move health initialization into a subclass
+    health = 1;
 
     // Update hitbox
     hitbox->update_pos(x, y, angle);
@@ -143,22 +150,22 @@ void Enemy::update(float delta)
             frame++;
             //if we are on the bite down frame, then check to see if the mouth point is in the player
             
-            //if (frame == BITE_ANIMATION * updatesPerFrame - 15) {
-            //    // Activate the fist
-            //    if (flip == SDL_FLIP_HORIZONTAL) {
-            //        fist->set_x(this->x + 33);
-            //        fist->set_y(this->y + 12);
-            //    }
-            //    else {
-            //        fist->set_x(this->x - 10);
-            //        fist->set_y(this->y + 12);
-            //    }
-            //    fist->update(delta);
-            //    fist->set_active(true);
-            //}
-            //else {
-            //    fist->set_active(false);
-            //}
+            if (frame == BITE_ANIMATION * updatesPerFrame - 15) {
+                // Activate the teeth
+                if (flip == SDL_FLIP_NONE) {
+                    teeth->set_x(this->x + 27);
+                    teeth->set_y(this->y + 12);
+                }
+                else {
+                    teeth->set_x(this->x - 4);
+                    teeth->set_y(this->y + 12);
+                }
+                teeth->update(delta);
+                teeth->set_active(true);
+            }
+            else {
+                teeth->set_active(false);
+            }
         }
         break;
     }
@@ -193,7 +200,9 @@ void Enemy::render(SDL_Renderer* renderer, Resources* resources, float delta, Ca
     //DEBUG Render hitbox
     if (DEBUG) {
         hitbox->render_corners(renderer, camera);
+        teeth->render(renderer, resources, delta, camera);
     }
+
 }
 
 
@@ -219,34 +228,45 @@ bool Enemy::does_collide(GameActorType id)
 
 void Enemy::collide_actor(GameActor* actor)
 {
-    isColliding = true;
-    x = px;
-    y = py;
-    // Try to bite the player
-    if (bite_timer <= 0) {
-        if (flip == SDL_FLIP_NONE) {
-            bite_box.x = x + w/2;
-            bite_box.y = y - 2;
-            bite_box.w = w;
-            bite_box.h = h + 4;
-        }
-        else {
-            bite_box.x = x - w/2;
-            bite_box.y = y - 2;
-            bite_box.w = w;
-            bite_box.h = h + 4;
-        }
-        
+    switch (actor->get_id()) {
+    case GameActorType::PLAYER:
+    {
+        isColliding = true;
+        x = px;
+        y = py;
+        // Try to bite the player
+        if (bite_timer <= 0) {
+            if (flip == SDL_FLIP_NONE) {
+                bite_box.x = x + w / 2;
+                bite_box.y = y - 2;
+                bite_box.w = w;
+                bite_box.h = h + 4;
+            }
+            else {
+                bite_box.x = x - w / 2;
+                bite_box.y = y - 2;
+                bite_box.w = w;
+                bite_box.h = h + 4;
+            }
 
-        SDL_Rect result;
-        //check to see if the player is in the right place
-        
-        if (SDL_IntersectRect(&bite_box, actor->get_hitbox()->get_rect(), &result)) {
-            //we are currently able to bite the player, start the bite
-            setAnimState(AnimState::BITE);
-            bite_timer = bite_cooldown;
+
+            SDL_Rect result;
+            //check to see if the player is in the right place
+
+            if (SDL_IntersectRect(&bite_box, actor->get_hitbox()->get_rect(), &result)) {
+                //we are currently able to bite the player, start the bite
+                setAnimState(AnimState::BITE);
+                bite_timer = bite_cooldown;
+            }
+
         }
-        
+    }
+    break;
+    case GameActorType::WEAPON:
+    {
+        take_damage(1);
+    }
+    break;
     }
 }
 
@@ -274,7 +294,18 @@ void Enemy::resolve_collisions()
     isColliding = false;
 }
 
+Enemy::~Enemy()
+{
+    delete teeth;
+    teeth = nullptr;
+}
+
 
 void Enemy::take_damage(int damage)
 {
+    health -= damage;
+    if (health <= 0) {
+        printf("Enemy has been killed\n");
+        alive = false;
+    }
 }

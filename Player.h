@@ -31,9 +31,9 @@ class Player : public GameActor {
 	unsigned char collision_flags, inner_collision_flags;
 	float px, py;
 	Fist* fist;
-
 	float slideX, slideY, superSlideX, superSlideY;
-	
+	int health;
+	float respawn_timer;
 
 	
 	//Animation Variables

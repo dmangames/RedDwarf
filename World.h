@@ -17,6 +17,7 @@
 
 class GameActor;
 class CollisionManager;
+class EnemyWeapon;
 
 class World {
 
@@ -29,7 +30,8 @@ class World {
 	MapGenerator* map_generator;
 	AStar::Generator path_generator;
 	std::vector<GameActor*> actors;
-	std::vector<Player*> players;
+	std::vector<GameActor*> players;
+	std::vector<GameActor*> enemy_weapons;
 	float player_respawn_timers[NUM_PLAYERS];
 	float enemy_spawn_timer;
 
@@ -44,7 +46,7 @@ public:
 	void update(InputHandler* inputs);
 	float get_delta();
 	std::vector<GameActor*>* get_actors();
-	std::vector<Player*>* get_players();
+	std::vector<GameActor*>* get_players();
 	Camera* get_camera();
 	bool generate_map(); //starting x and y position is 0, 0, map width and height determined by MapGenerator
 	MapGenerator* get_map();

@@ -4,10 +4,12 @@
 #include "GameActor.h"
 #include "Hitbox.h"
 #include "Player.h"
+#include "EnemyWeapon.h"
 
 class Enemy : public GameActor {
 	// References
 	Player* player;
+	std::vector<GameActor*>* enemy_weapons;
 
 	// General Variables
 	float vx, vy;
@@ -20,7 +22,8 @@ class Enemy : public GameActor {
 	float px, py;
 	float bite_cooldown, bite_timer;
 	SDL_Rect bite_box;
-
+	EnemyWeapon* teeth;
+	int health;
 
 
 
@@ -46,7 +49,7 @@ class Enemy : public GameActor {
 	void setAnimState(AnimState s);
 
 public:
-	Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player);
+	Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player* player, std::vector<GameActor*>& sharp_things);
 	void update(float delta);
 	void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera);
 	bool is_alive();
@@ -57,4 +60,5 @@ public:
 	void collide_tile(Tile* tile);
 	void resolve_collisions();
 	void take_damage(int damage);
+	~Enemy();
 };

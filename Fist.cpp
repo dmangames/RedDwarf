@@ -36,6 +36,8 @@ void Fist::collide_actor(GameActor* actor)
 
 void Fist::collide_tile(Tile* tile)
 {
+	if (!active)
+		return;
 	if (tile->type != TileType::EMPTY) {
 		//Apply next layer of destruction
 		printf("Applying Damage from Fist!\n");

@@ -43,7 +43,7 @@ public:
 	void present_renderer(float delta);
 	void render_tiles(MapGenerator* map, float delta, Camera* camera); // render the tiles that can be seen on camera
 	void render_actors(std::vector<GameActor*>* actors, float delta, Camera* camera); //render with camera offset
-	void render_players(std::vector<Player*>* players, float delta, Camera* camera);
+	void render_players(std::vector<GameActor*>* players, float delta, Camera* camera);
 	int get_width();
 	int get_height();
 	~Graphics();

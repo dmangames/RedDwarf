@@ -1,7 +1,7 @@
 #include "CollisionManager.h"
 
-CollisionManager::CollisionManager(std::vector<GameActor*>* actors) {
-	this->actors = actors;
+CollisionManager::CollisionManager() {
+
 }
 
 
@@ -207,8 +207,8 @@ bool check_actor_tile_intersect(Hitbox* h1, int tile_x, int tile_y, int tile_w, 
 }
 
 
-// Check for collisions and notify entities
-void CollisionManager::check_collisions() {
+// Check for collisions for 1 list of actors and notify entities
+void CollisionManager::check_actor_collisions(std::vector<GameActor*>* actors) {
 
 	for (int i = 0; i < actors->size(); i++) {
 		if ((*actors)[i]->collides() && (*actors)[i]->is_active()) {
@@ -233,7 +233,47 @@ void CollisionManager::check_collisions() {
 
 }
 
-void CollisionManager::check_tile_collisions(MapGenerator* map)
+void CollisionManager::check_collisions(std::vector<GameActor*>& actors1, std::vector<GameActor*>& actors2)
+{
+	for (GameActor* a1 : actors1) {
+		if (!a1->is_active())
+			continue;
+		for (GameActor* a2 : actors2) {
+			if (!a2->is_active())
+				continue;
+			if (a1->does_collide(a2->get_id())) {
+				//check hitbox overlap
+				if (check_hitboxes(a1->get_hitbox(), a2->get_hitbox())) {
+					//notify actors of collision
+					a1->collide_actor(a2);
+					a2->collide_actor(a1);
+				}
+			}
+		}
+	}
+	//for (int i = 0; i < actors1.size(); i++) {
+	//	if (actors1[i]->collides() && actors1[i]->is_active()) {
+	//		for (int j = 0; j < actors2.size(); j++) {
+	//			// Make sure not to check it against itself
+	//			if (j != i) {
+	//				if (actors1[i]->does_collide(actors2[j]->get_id())) {
+	//					// Do the hitboxes overlap?
+	//					if (check_hitboxes(actors1[i]->get_hitbox(), actors2[j]->get_hitbox())) {
+	//						// If so, notify the entites if both entities are active
+	//						if (actors1[i]->is_active() && actors2[j]->is_active()) {
+	//							actors1[i]->collide_actor(actors2[j]);
+	//							actors2[j]->collide_actor(actors1[i]);
+	//						}
+
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+}
+
+void CollisionManager::check_tile_collisions(MapGenerator* map, std::vector<GameActor*>* actors)
 {
 	//we need all the actor positions converted to grid locations
 	for (int i = 0; i < actors->size(); i++) {

@@ -99,10 +99,10 @@ void Graphics::render_actors(std::vector<GameActor*>* actors, float delta, Camer
 	}
 }
 
-void Graphics::render_players(std::vector<Player*>* players, float delta, Camera* camera) {
+void Graphics::render_players(std::vector<GameActor*>* players, float delta, Camera* camera) {
 	for (int i = 0; i < players->size(); ++i) {
-		//(*players)[i]->render(renderer, resources, delta, camera);
-		(*players)[i]->render_inventory(font_renderer, renderer, resources, camera);
+		dynamic_cast<Player*>((*players)[i])->render(renderer, resources, delta, camera);
+		dynamic_cast<Player*>((*players)[i])->render_inventory(font_renderer, renderer, resources, camera);
 	}
 }
 

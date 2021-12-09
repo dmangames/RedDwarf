@@ -8,6 +8,7 @@
 #include "AStar.hpp"
 #include <iostream>
 
+
 #define MAP_SIZE_WIDTH 100 //screen_w/32 + 10
 #define MAP_SIZE_HEIGHT 100 //screen_h/32 + 10
 
@@ -22,10 +23,8 @@ const float World::ENEMY_PATHFIND_DELAY = 1.0f;
 void World::check_spawn_players() {
 
     bool players_alive[NUM_PLAYERS] = { false };
-    for (int i = 0; i < actors.size(); i++) {
-        if (actors[i]->get_id() == GameActorType::PLAYER) {
-            players_alive[((Player*)actors[i])->get_player_num() - 1] = true;
-        }
+    for (int i = 0; i < players.size(); i++) {
+        players_alive[((Player*)players[i])->get_player_num() - 1] = true;
     }
     for (int i = 0; i < NUM_PLAYERS; i++) {
         if (!players_alive[i] && player_respawn_timers[i] == 0) {
@@ -49,8 +48,9 @@ void World::spawn_enemies() {
     std::tuple<int, int> t = map_generator->get_random_spawn_loc();
     int spawn_x = std::get<0>(t) * 32;
     int spawn_y = std::get<1>(t) * 32;
-
-    actors.push_back(new Enemy(spawn_x, spawn_y, 32, 32, screen_w, screen_h, players[0]));
+    
+    Enemy* e = new Enemy(spawn_x, spawn_y, 32, 32, screen_w, screen_h, dynamic_cast<Player*>(players[0]), enemy_weapons);
+    actors.push_back(e);
 
 }
 
@@ -99,7 +99,7 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     }
     std::srand(seed);
 
-    collision_manager = new CollisionManager(&actors);
+    collision_manager = new CollisionManager();
     camera = new Camera(screen_w, screen_h);
     map_generator = new MapGenerator(MAP_SIZE_WIDTH, MAP_SIZE_HEIGHT, 50);
     generate_map();
@@ -107,7 +107,7 @@ World::World(int screen_w, int screen_h) : player_respawn_timers() {
     //actors.push_back(new Player(screen_w / 6 + 32, screen_h / 2 - 32, 1, screen_w, screen_h, &actors, camera));
     SDL_Point* spawn_point = map_generator->get_random_empty_cell();
     Player* p = new Player(spawn_point->x * 32, spawn_point->y * 32, 1, screen_w, screen_h, &actors, camera);
-    actors.push_back(p);
+    //actors.push_back(p);
     players.push_back(p);
 
 
@@ -136,12 +136,14 @@ void World::update(InputHandler* inputs) {
 
     // Handle input
     // Deliver input to each Player
-    for (int i = 0; i < actors.size(); i++) {
-        if (actors[i]->get_id() == GameActorType::PLAYER) {
-            ((Player*)actors[i])->handle_inputs(clock.get_delta(), inputs);
-        }
+    for (GameActor* player : players) {
+        ((Player*)player)->handle_inputs(clock.get_delta(), inputs);
     }
 
+    //Update players
+    for (GameActor* player : players) {
+        ((Player*)player)->update(clock.get_delta());
+    }
     // Update entities
     for (int i = 0; i < actors.size(); i++) {
         actors[i]->update(clock.get_delta());
@@ -150,15 +152,20 @@ void World::update(InputHandler* inputs) {
     // Run AI Pathfinding
     //find_path();
 
-    // Check for collisions
-    collision_manager->check_collisions();
-
+    // Check for collisions between players and enemies
+    collision_manager->check_collisions(players, actors);
+    // Check for player / enemy weapon collisions
+    collision_manager->check_collisions(players, enemy_weapons);
     // Check for tile map collisions
-    collision_manager->check_tile_collisions(map_generator);
+    collision_manager->check_tile_collisions(map_generator, &actors);
+    collision_manager->check_tile_collisions(map_generator, &players);
 
     camera->update();
 
     // Resolve actor collisions
+    for (GameActor* p : players) {
+        p->resolve_collisions();
+    }
     for (int i = 0; i < actors.size(); i++) {
         actors[i]->resolve_collisions();
     }
@@ -174,16 +181,6 @@ void World::update(InputHandler* inputs) {
             actors[i] = NULL;
             actors.erase(actors.begin() + i);
             i -= 1;
-        }
-    }
-
-    // Update player respawn timers
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        if (player_respawn_timers[i] > 0) {
-            player_respawn_timers[i] -= clock.get_delta();
-            if (player_respawn_timers[i] < 0) {
-                player_respawn_timers[i] = 0;
-            }
         }
     }
 
@@ -213,7 +210,7 @@ std::vector<GameActor*>* World::get_actors() {
     return &actors;
 }
 
-std::vector<Player*>* World::get_players()
+std::vector<GameActor*>* World::get_players()
 {
     return &players;
 }

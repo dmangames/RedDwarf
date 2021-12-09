@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "TileItem.h"
+#include "EnemyWeapon.h"
 
 #define DEBUG false
 
@@ -71,6 +72,7 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
     frame = 0;
     startFrame = 0;
     updatesPerFrame = 16;
+    this->health = 3;
 
     this->camera = camera;
 
@@ -86,7 +88,16 @@ Player::Player(float x, float y, int player_num, int screen_w, int screen_h, std
 }
 
 void Player::update(float delta) {
-
+    if (!active) {
+        respawn_timer -= delta;
+        if (respawn_timer <= 0) {
+            active = true;
+            health = 3;
+        }
+        else {
+            return;
+        }
+    }
     // Store where I came from (old position before update)
     px = x;
     py = y;
@@ -196,6 +207,8 @@ void Player::update(float delta) {
 }
 
 void Player::render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera) {
+    if (!active)
+        return;
     SDL_Texture* texture;
     texture = resources->get_texture("dwarf", 1);
 
@@ -331,13 +344,17 @@ bool Player::does_collide(GameActorType type) {
     return type == GameActorType::DESTRUCTABLE
         || type == GameActorType::ENEMY
         || type == GameActorType::ROCK
-        || type == GameActorType::TILEITEM;
+        || type == GameActorType::TILEITEM
+        || type == GameActorType::ENEMY_WEAPON;
 }
 
 void Player::collide_actor(GameActor* actor) {
     switch (actor->get_id()) {
-    case GameActorType::DESTRUCTABLE:
-        
+    case GameActorType::ENEMY_WEAPON:
+    {
+        take_damage(dynamic_cast<EnemyWeapon*>(actor)->get_damage());
+        dynamic_cast<EnemyWeapon*>(actor)->set_active(false);
+    }
         break;
     case GameActorType::TILEITEM:
     {
@@ -346,7 +363,7 @@ void Player::collide_actor(GameActor* actor) {
         break;
     }
     case GameActorType::ENEMY:
-        printf("Colliding with enemy object.\n");
+        //printf("Colliding with enemy object.\n");
         break;
     case GameActorType::PLAYER:
         printf("Colliding with player object.\n");
@@ -621,6 +638,13 @@ int Player::get_player_num() {
 void Player::take_damage(int damage)
 {
     //TODO:make player take damage
+    printf("Took damage: %d\n", damage);
+    health -= damage;
+    if (health <= 0) {
+        printf("Player has been killed\n");
+        active = false;
+        respawn_timer = 3.0f;
+    }
 }
 
 void Player::render_inventory(FontRenderer* font_renderer, SDL_Renderer* renderer, Resources* resources, Camera* camera)
@@ -645,6 +669,42 @@ void Player::render_inventory(FontRenderer* font_renderer, SDL_Renderer* rendere
     SDL_RenderCopy(renderer, text_texture, NULL, &dst);
 
     SDL_DestroyTexture(text_texture);
+
+    // Health GUI
+    text_texture = NULL;
+    text = "Health: " + std::to_string(health);
+    font_renderer->load_font_texture(&text_texture, "lazy", text, color);
+    SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+
+    dst = {
+        500,
+        16,
+        text_width,
+        text_height
+    };
+
+    SDL_RenderCopy(renderer, text_texture, NULL, &dst);
+
+    SDL_DestroyTexture(text_texture);
+
+    if (!active) {
+        // Respawn timer GUI
+        text_texture = NULL;
+        text = "Respawning: " + std::to_string(respawn_timer);
+        font_renderer->load_font_texture(&text_texture, "lazy", text, color);
+        SDL_QueryTexture(text_texture, NULL, NULL, &text_width, &text_height);
+
+        dst = {
+            700,
+            16,
+            text_width,
+            text_height
+        };
+
+        SDL_RenderCopy(renderer, text_texture, NULL, &dst);
+
+        SDL_DestroyTexture(text_texture);
+    }
 }
 
 void Player::load_animations() {
