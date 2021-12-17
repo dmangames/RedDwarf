@@ -5,7 +5,7 @@
 
 void MapGenerator::random_fill_map()
 {
-	printf("Random number: %d\n",std::rand());
+	printf("Random number: %d\n", std::rand());
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < height; y++) {
 			//Set tile coordinates (top left origin)
@@ -13,20 +13,27 @@ void MapGenerator::random_fill_map()
 			(*map)[x][y].y = y;
 			//Make a solid border around the map
 			if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-				(*map)[x][y].type = TileType::METAL;
-				(*map)[x][y].health = 16;
-				(*map)[x][y].max_health = 16;
+				(*map)[x][y].type = TileType::BLUEROCK;
+				(*map)[x][y].health = 99999;
+				(*map)[x][y].max_health = 99999;
 			}
 			else {
 				if ((std::rand() % 100 < randomFillPercent)) {
-					(*map)[x][y].type = TileType::DIRT;
-					(*map)[x][y].health = 8;
-					(*map)[x][y].max_health = 8;
+					if ((std::rand() % 100 < 81)) {
+						(*map)[x][y].type = TileType::REDROCK;
+						(*map)[x][y].health = 8;
+						(*map)[x][y].max_health = 8;
+					}
+					else {
+						(*map)[x][y].type = TileType::PURPLEROCK;
+						(*map)[x][y].health = 16;
+						(*map)[x][y].max_health = 16;
+					}
 				}
 				else {
 					(*map)[x][y].type = TileType::EMPTY;
 				}
-				
+
 			}
 		}
 	}
@@ -34,11 +41,14 @@ void MapGenerator::random_fill_map()
 	for (int i = 0; i < 20; i++) {
 		SDL_Point* p = get_random_empty_cell();
 		// Get the cell's neighbors
-		for (auto t : *get_neighboring_cells(p->x, p->y, rand()%15)) {
-			if (t->type != TileType::METAL) {
-				t->type = TileType::EMPTY;
-				t->health = 0;
-				t->max_health = 0;
+		for (auto t : *get_neighboring_cells(p->x, p->y, rand() % 15)) {
+			if (t->type != TileType::BLUEROCK) {
+				if ((std::rand() % 100 < 81)) {
+					t->type = TileType::EMPTY;
+					t->health = 0;
+					t->max_health = 0;
+				}
+
 			}
 
 		}
@@ -63,7 +73,7 @@ MapGenerator::MapGenerator(int width, int height, int randomFillPercent) {
 	this->width = width;
 	this->height = height;
 	this->randomFillPercent = randomFillPercent;
-	map = new std::vector<std::vector<Tile>>(width, std::vector<Tile>(height, { 0, 0, 8, 8, TileType::DIRT }));
+	map = new std::vector<std::vector<Tile>>(width, std::vector<Tile>(height, { 0, 0, 8, 8, TileType::REDROCK }));
 	spawn_loc_map = new std::map<std::tuple<int, int>, Tile>();
 }
 
@@ -112,15 +122,18 @@ void MapGenerator::render(SDL_Renderer* renderer, Resources* resources, float de
 			src.w = 32;
 			src.h = 32;
 			switch (tile.type) {
-			case TileType::DIRT:
+			case TileType::REDROCK:
 					texture = resources->get_texture("redrock", 1);
 					SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(tile.max_health - tile.health), &dst, 0, NULL, SDL_FLIP_NONE);
-
 					break;
-			case TileType::METAL:
+			case TileType::PURPLEROCK:
 					texture = resources->get_texture("purplerock", 1);
 					SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32((tile.max_health - tile.health)/2), &dst, 0, NULL, SDL_FLIP_NONE);
 					break;
+			case TileType::BLUEROCK:
+				texture = resources->get_texture("bluerock", 1);
+				SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(0), &dst, 0, NULL, SDL_FLIP_NONE);
+				break;
 			case TileType::SPAWNER:
 				texture = resources->get_texture("spawner", 1);
 				SDL_RenderCopyEx(renderer, texture, resources->get_anim_rect_32(0), &dst, 0, NULL, SDL_FLIP_NONE);

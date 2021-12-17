@@ -74,6 +74,8 @@ void Resources::load_resources() {
 	load_texture(&textures["redrock"][1], "redrock_ss.png");
 	load_texture(&textures["redrock"][2], "redrock_item.png");
 	load_texture(&textures["purplerock"][1], "purplerock_ss.png");
+	load_texture(&textures["purplerock"][2], "purplerock_item.png");
+	load_texture(&textures["bluerock"][1], "bluerock_ss.png");
 	load_texture(&textures["spawner"][1], "spawn_pit.png");
 	load_texture(&textures["pinkling"][1], "pinkling_ss.png");
 	

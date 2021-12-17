@@ -2,9 +2,10 @@
 
 enum class TileType {
 	EMPTY,
-	DIRT,
-	ROCK,
-	METAL,
+	REDROCK,
+	PURPLEROCK,
+	GOLDROCK,
+	BLUEROCK,
 	SPAWNER
 };
 

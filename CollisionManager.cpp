@@ -289,12 +289,12 @@ void CollisionManager::check_tile_collisions(MapGenerator* map, std::vector<Game
 				switch (t->type) {
 				case TileType::EMPTY:
 					continue;
-				case TileType::DIRT:
+				case TileType::REDROCK:
 					if(check_actor_tile_intersect((*actors)[i]->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
 						(*actors)[i]->collide_tile(t);
 					}
 					break;
-				case TileType::METAL:
+				case TileType::PURPLEROCK:
 					if (check_actor_tile_intersect((*actors)[i]->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
 						(*actors)[i]->collide_tile(t);
 					}
@@ -320,12 +320,12 @@ Tile* CollisionManager::check_actor_tile_collisions(GameActor* actor, MapGenerat
 			switch (t->type) {
 			case TileType::EMPTY:
 				continue;
-			case TileType::DIRT:
+			case TileType::REDROCK:
 				if (check_actor_tile_intersect(actor->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
 					return t;
 				}
 				break;
-			case TileType::METAL:
+			case TileType::PURPLEROCK:
 				if (check_actor_tile_intersect(actor->get_hitbox(), t->x * 32, t->y * 32, 32, 32)) {
 					return t;
 				}

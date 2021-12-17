@@ -6,8 +6,12 @@ TileItem::TileItem(TileType type, float x, float y, int w, int h):Item(x, y, w, 
 {
     this->type = type;
     switch (type) {
-    case TileType::DIRT:
+    case TileType::REDROCK:
         sprite_name = "redrock";
+        break;
+    case TileType::PURPLEROCK:
+        sprite_name = "purplerock";
+        break;
     default:
         sprite_name = "redrock";
     }
@@ -54,14 +58,14 @@ void TileItem::collide_actor(GameActor* actor)
 int TileItem::get_tile_minerals()
 {
     switch (type) {
-    case TileType::DIRT:
+    case TileType::REDROCK:
         return 1;
         break;
-    case TileType::ROCK:
+    case TileType::PURPLEROCK:
         return 4;
-        break;
-    case TileType::METAL:
+    case TileType::GOLDROCK:
         return 8;
+        break;
 
     }
 }
