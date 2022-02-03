@@ -25,7 +25,7 @@ void Fist::render(SDL_Renderer* renderer, Resources* resources, float delta, Cam
 
 void Fist::collide_actor(GameActor* actor)
 {
-	if (actor->get_id() == GameActorType::ROCK && active) {
+	if (actor->get_id() == GameActorType::ENEMY && active) {
 		//Apply next layer of destruction
 		printf("Applying Damage from Fist!\n");
 		actor->take_damage(1);

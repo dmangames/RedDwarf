@@ -67,6 +67,7 @@ Enemy::Enemy(float x, float y, int w, int h, int screen_w, int screen_h, Player*
     teeth = new EnemyWeapon(x, y, 4, 4, 1);
 
     this->enemy_weapons->push_back(teeth);
+    teeth_index = enemy_weapons->size() - 1;
 
     //TODO:move health initialization into a subclass
     health = 1;
@@ -223,7 +224,7 @@ const bool Enemy::collides()
 
 bool Enemy::does_collide(GameActorType id)
 {
-	return id == GameActorType::PLAYER;
+	return id == GameActorType::PLAYER || id == GameActorType::WEAPON;
 }
 
 void Enemy::collide_actor(GameActor* actor)
@@ -296,8 +297,10 @@ void Enemy::resolve_collisions()
 
 Enemy::~Enemy()
 {
-    delete teeth;
-    teeth = nullptr;
+    //mark teeth for delete
+    teeth->set_active(false);
+    teeth->set_alive(false);
+
 }
 
 
@@ -306,6 +309,7 @@ void Enemy::take_damage(int damage)
     health -= damage;
     if (health <= 0) {
         printf("Enemy has been killed\n");
+        active = false;
         alive = false;
     }
 }

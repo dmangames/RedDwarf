@@ -30,6 +30,7 @@ protected:
 	int screen_w, screen_h;
 	Hitbox* hitbox;
 	bool active; // Used to toggle if world should take this actor into account
+	bool alive; // used to mark actor for deletion if false
 	float get_center_x();
 	float get_center_y();
 	void check_bounds();
@@ -44,6 +45,7 @@ public:
 	void set_y(float y);
 	void set_active(bool isActive);
 	bool is_active();
+	void set_alive(bool aliveStatus);
 	virtual ~GameActor() = 0;
 	virtual void update(float delta) = 0;
 	virtual void render(SDL_Renderer* renderer, Resources* resources, float delta, Camera* camera) = 0;

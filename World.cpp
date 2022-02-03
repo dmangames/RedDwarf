@@ -84,7 +84,7 @@ void World::find_path() {
 World::World(int screen_w, int screen_h) : player_respawn_timers() {
 
     // Set seed
-    seed = 9456;
+    seed = 5832;
 
     // Set variables
     this->screen_w = screen_w;
@@ -156,6 +156,8 @@ void World::update(InputHandler* inputs) {
     collision_manager->check_collisions(players, actors);
     // Check for player / enemy weapon collisions
     collision_manager->check_collisions(players, enemy_weapons);
+    // Check for player weapon collision
+    collision_manager->check_actor_collisions(&actors); // this checks all actors if they collide or not, TODO: break out the player's weapons and have them check against enemies
     // Check for tile map collisions
     collision_manager->check_tile_collisions(map_generator, &actors);
     collision_manager->check_tile_collisions(map_generator, &players);
@@ -180,6 +182,16 @@ void World::update(InputHandler* inputs) {
             delete actors[i];
             actors[i] = NULL;
             actors.erase(actors.begin() + i);
+            i -= 1;
+        }
+    }
+
+    // Prune dead entities from enemy weapon vector
+    for (int i = 0; i < enemy_weapons.size(); i++) {
+        if (!enemy_weapons[i]->is_alive()) {
+            delete enemy_weapons[i];
+            enemy_weapons[i] = NULL;
+            enemy_weapons.erase(enemy_weapons.begin() + i);
             i -= 1;
         }
     }

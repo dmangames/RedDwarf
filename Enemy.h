@@ -24,6 +24,7 @@ class Enemy : public GameActor {
 	SDL_Rect bite_box;
 	EnemyWeapon* teeth;
 	int health;
+	int teeth_index; //what index the teeth are at so we can delete it
 
 
 

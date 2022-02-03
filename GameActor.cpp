@@ -39,6 +39,7 @@ GameActor::GameActor() {
 	screen_h = 0;
 	hitbox = NULL;
 	active = true;
+	alive = true;
 }
 
 GameActor::GameActor(float x, float y, int w, int h)
@@ -60,6 +61,7 @@ GameActor::GameActor(float x, float y, int w, int h, int screen_w, int screen_h)
 	this->screen_h = screen_h;
 	hitbox = NULL;
 	active = true;
+	alive = true;
 }
 
 Hitbox* GameActor::get_hitbox() {
@@ -88,6 +90,11 @@ void GameActor::set_active(bool isActive) {
 
 bool GameActor::is_active() {
 	return active;
+}
+
+void GameActor::set_alive(bool aliveStatus)
+{
+	alive = aliveStatus;
 }
 
 GameActor::~GameActor() {
